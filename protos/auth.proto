@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package grpc.proto.auth;
+
+option go_package = "auth/pb/auth_pb";
+
+message LoginReq {
+  string account = 1;
+  string password = 2;
+}
+
+message LoginResp {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+service AuthService{
+  rpc GetToken(LoginReq) returns (LoginResp);
+}
