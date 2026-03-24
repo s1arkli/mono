@@ -9,7 +9,7 @@ import (
 
 func Gen(db *gorm.DB, module string) {
 	g := gen.NewGenerator(gen.Config{
-		OutPath: fmt.Sprintf("./application/%s/internal/infra/dal", module), // 生成代码输出目录
+		OutPath: fmt.Sprintf("./service/%s/internal/infra/dal", module), // 生成代码输出目录
 		Mode: gen.WithDefaultQuery | // 生成默认 Query 对象
 			gen.WithQueryInterface, // 生成接口
 		FieldNullable: true,

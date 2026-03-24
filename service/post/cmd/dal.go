@@ -15,8 +15,8 @@ func init() {
 var dalCmd = &cobra.Command{
 	Use: "dal",
 	Run: func(cmd *cobra.Command, args []string) {
-		initial.Viper("service/auth/config.yaml")
+		initial.Viper("service/post/config.yaml")
 		dbc.InitPgsql()
-		dal.Gen(dbc.GetDB(), "auth")
+		dal.Gen(dbc.GetDB(), "post")
 	},
 }

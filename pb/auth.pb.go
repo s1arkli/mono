@@ -4,7 +4,7 @@
 // 	protoc        v6.33.4
 // source: auth.proto
 
-package auth_pb
+package pb
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -298,7 +298,7 @@ const file_auth_proto_rawDesc = "" +
 	"\vAuthService\x12@\n" +
 	"\bRegister\x12\x1c.grpc.proto.auth.RegisterReq\x1a\x16.google.protobuf.Empty\x12>\n" +
 	"\x05Login\x12\x19.grpc.proto.auth.LoginReq\x1a\x1a.grpc.proto.auth.LoginResp\x12D\n" +
-	"\aRefresh\x12\x1b.grpc.proto.auth.RefreshReq\x1a\x1c.grpc.proto.auth.RefreshRespB\x10Z\x0ejwt/pb/auth_pbb\x06proto3"
+	"\aRefresh\x12\x1b.grpc.proto.auth.RefreshReq\x1a\x1c.grpc.proto.auth.RefreshRespB\tZ\amono/pbb\x06proto3"
 
 var (
 	file_auth_proto_rawDescOnce sync.Once

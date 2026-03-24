@@ -4,7 +4,7 @@ import "google/protobuf/empty.proto";
 
 package grpc.proto.auth;
 
-option go_package = "jwt/pb/auth_pb";
+option go_package = "mono/pb";
 
 message RegisterReq {
   string account = 1;

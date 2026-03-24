@@ -13,7 +13,7 @@ var (
 	auth authpb.AuthServiceClient
 )
 
-func init() {
+func InitAuthClient() {
 	initAuthConn()
 	auth = authpb.NewAuthServiceClient(GetGrpcConn())
 }
@@ -39,7 +39,7 @@ func Register(c *gin.Context) {
 		Password: req.Password,
 	})
 	if err != nil {
-		response.Fail(c, ecode.SystemErr)
+		response.Fail(c, ecode.New(1, err.Error()))
 		return
 	}
 	response.Success(c, "ok")
@@ -66,7 +66,7 @@ func Login(c *gin.Context) {
 		Password: req.Password,
 	})
 	if err != nil {
-		response.Fail(c, ecode.SystemErr)
+		response.Fail(c, ecode.New(1, err.Error()))
 		return
 	}
 	response.Success(c, resp)
@@ -92,7 +92,7 @@ func Refresh(c *gin.Context) {
 	})
 	if err != nil {
 		c.SetCookie("refresh_token", "", -1, "/api/auth", "", true, true)
-		response.Fail(c, ecode.SystemErr)
+		response.Fail(c, ecode.New(1, err.Error()))
 		return
 	}
 

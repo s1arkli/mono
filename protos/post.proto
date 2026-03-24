@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package rpc.proto.post;
+
+option go_package = "mono/pb";
+
+message PostListReq {
+  int32 page = 1;
+  int32 page_size = 2;
+
+  int32 category_id = 10;
+  SortType sort = 11;
+}
+
+enum SortType {
+  SORT_TYPE_DEFAULT = 0;
+  SORT_TYPE_HOT = 1;
+  SORT_TYPE_NEW = 2;
+}
+
+message PostListResp {
+  repeated PostListItem posts = 1;
+  int32 total = 2;
+}
+
+message PostListItem {
+  string title = 1;
+  string summary = 2;
+  int64 post_id = 3;
+
+  int64 uid = 10;
+  string avatar = 11;
+  string nickname = 12;
+
+  int32 like_count = 20;
+  int32 collect_count = 21;
+  int32 comment_count = 22;
+  int32 view_count = 23;
+
+  bool is_topped = 30;
+  int64 created_at = 39;
+}
+
+message PostCreateReq {
+  int64 uid = 1;
+  string title = 2;
+  string content = 3;
+  int32 post_type =4;
+}
+
+message PostDetailReq {
+  int64 post_id = 1;
+}
+
+message PostDetailResp {
+  string title = 1;
+  string content = 2;
+  int64 uid = 3;
+  string avatar = 4;
+  string nickname = 5;
+
+  int32 like_count = 10;
+  int32 collect_count = 11;
+  int32 view_count = 13;
+}
+
+service Post{
+  rpc List(PostListReq) returns (PostListResp);
+  rpc Create(PostCreateReq) returns (google.protobuf.Empty);
+  rpc Detail(PostDetailReq) returns (PostDetailResp);
+}

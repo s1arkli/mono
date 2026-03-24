@@ -9,6 +9,8 @@ import (
 
 	"mono/gateway/initial"
 	"mono/gateway/router"
+	"mono/gateway/service/auth"
+	"mono/gateway/service/post"
 )
 
 func init() {
@@ -22,6 +24,9 @@ var apiCmd = &cobra.Command{
 		r := gin.Default()
 
 		initial.Viper("./gateway/config.yaml")
+		auth.InitAuthClient()
+		post.InitPostClient()
+
 		router.Api(r)
 
 		port := viper.GetString("api.port")

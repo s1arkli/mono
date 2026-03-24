@@ -10,10 +10,9 @@ import (
 	"google.golang.org/grpc"
 
 	"mono/gateway/initial"
-	authpb "mono/pb"
+	"mono/pb"
 	"mono/pkg/dbc"
-	"mono/service/auth/internal/interfaces"
-	"mono/service/auth/pkg/gen"
+	"mono/service/post/internal/interfaces"
 )
 
 func init() {
@@ -22,10 +21,9 @@ func init() {
 
 var authCmd = &cobra.Command{
 	Use:   "rpc",
-	Short: "Auth application",
+	Short: "Post application",
 	Run: func(cmd *cobra.Command, args []string) {
-		initial.Viper("service/auth/config.yaml")
-		gen.InitSnow()
+		initial.Viper("service/post/config.yaml")
 		dbc.InitPgsql()
 
 		db := dbc.GetDB()
@@ -37,7 +35,7 @@ var authCmd = &cobra.Command{
 		s := grpc.NewServer()
 
 		// 这一步是必须的：把你的实现注册到 gRPC Server
-		authpb.RegisterAuthServiceServer(s, &interfaces.Auth{
+		pb.RegisterPostServer(s, &interfaces.Post{
 			DB: db,
 		})
 

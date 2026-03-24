@@ -22,6 +22,6 @@ func InitPgsql() {
 	pgDB = db
 }
 
-func GetAuthDB() *gorm.DB {
+func GetDB() *gorm.DB {
 	return pgDB
 }

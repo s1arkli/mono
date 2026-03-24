@@ -6,3 +6,8 @@ proto:
 
 doc:
 	swag init --dir ./gateway/service -g doc.go --parseDependency --output ./gateway/doc/app
+
+auth_dal:
+	go run service/auth/main.go dal
+post_dal:
+	go run service/post/main.go dal
