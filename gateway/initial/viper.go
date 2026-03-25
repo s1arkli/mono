@@ -2,20 +2,19 @@ package initial
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/spf13/viper"
 )
 
-func Viper(path string) {
+func Viper(module string) {
 	viper.SetEnvPrefix("mono")
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-	viper.SetConfigFile(path)
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Fprintf(os.Stderr, "fatal: read config %s failed: %v\n", path, err)
-		os.Exit(1)
-	}
+	viper.SetConfigFile("config/config.yaml")
+	viper.ReadInConfig()
+
+	viper.SetConfigFile(fmt.Sprintf("config/%s/config.yaml", module))
+	viper.MergeInConfig()
 }

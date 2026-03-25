@@ -5,7 +5,7 @@ import (
 
 	"mono/gateway/initial"
 	"mono/pkg/dal"
-	"mono/service/post/pkg"
+	"mono/service/user/pkg"
 )
 
 func init() {
@@ -13,7 +13,8 @@ func init() {
 }
 
 var dalCmd = &cobra.Command{
-	Use: "dal",
+	Use:   "dal",
+	Short: "dal",
 	Run: func(cmd *cobra.Command, args []string) {
 		initial.Viper(pkg.Module)
 		initial.Postgres()

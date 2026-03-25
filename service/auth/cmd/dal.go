@@ -5,7 +5,7 @@ import (
 
 	"mono/gateway/initial"
 	"mono/pkg/dal"
-	"mono/pkg/dbc"
+	"mono/service/auth/pkg"
 )
 
 func init() {
@@ -15,8 +15,8 @@ func init() {
 var dalCmd = &cobra.Command{
 	Use: "dal",
 	Run: func(cmd *cobra.Command, args []string) {
-		initial.Viper("service/auth/config.yaml")
-		dbc.InitPgsql()
-		dal.Gen(dbc.GetDB(), "auth")
+		initial.Viper(pkg.Module)
+		initial.Postgres()
+		dal.Gen(initial.GetDB(), pkg.Module)
 	},
 }

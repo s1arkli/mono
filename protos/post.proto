@@ -10,7 +10,7 @@ message PostListReq {
   int32 page = 1;
   int32 page_size = 2;
 
-  int32 category_id = 10;
+  int32 post_type = 10;
   SortType sort = 11;
 }
 
@@ -22,7 +22,7 @@ enum SortType {
 
 message PostListResp {
   repeated PostListItem posts = 1;
-  int32 total = 2;
+  int64 total = 2;
 }
 
 message PostListItem {

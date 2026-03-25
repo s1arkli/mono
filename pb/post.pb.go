@@ -75,7 +75,7 @@ type PostListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	CategoryId    int32                  `protobuf:"varint,10,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
+	PostType      int32                  `protobuf:"varint,10,opt,name=post_type,json=postType,proto3" json:"post_type,omitempty"`
 	Sort          SortType               `protobuf:"varint,11,opt,name=sort,proto3,enum=rpc.proto.post.SortType" json:"sort,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -125,9 +125,9 @@ func (x *PostListReq) GetPageSize() int32 {
 	return 0
 }
 
-func (x *PostListReq) GetCategoryId() int32 {
+func (x *PostListReq) GetPostType() int32 {
 	if x != nil {
-		return x.CategoryId
+		return x.PostType
 	}
 	return 0
 }
@@ -142,7 +142,7 @@ func (x *PostListReq) GetSort() SortType {
 type PostListResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Posts         []*PostListItem        `protobuf:"bytes,1,rep,name=posts,proto3" json:"posts,omitempty"`
-	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	Total         int64                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -184,7 +184,7 @@ func (x *PostListResp) GetPosts() []*PostListItem {
 	return nil
 }
 
-func (x *PostListResp) GetTotal() int32 {
+func (x *PostListResp) GetTotal() int64 {
 	if x != nil {
 		return x.Total
 	}
@@ -540,17 +540,16 @@ var File_post_proto protoreflect.FileDescriptor
 const file_post_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"post.proto\x12\x0erpc.proto.post\x1a\x1bgoogle/protobuf/empty.proto\"\x8d\x01\n" +
+	"post.proto\x12\x0erpc.proto.post\x1a\x1bgoogle/protobuf/empty.proto\"\x89\x01\n" +
 	"\vPostListReq\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\x12\x1f\n" +
-	"\vcategory_id\x18\n" +
-	" \x01(\x05R\n" +
-	"categoryId\x12,\n" +
+	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\x12\x1b\n" +
+	"\tpost_type\x18\n" +
+	" \x01(\x05R\bpostType\x12,\n" +
 	"\x04sort\x18\v \x01(\x0e2\x18.rpc.proto.post.SortTypeR\x04sort\"X\n" +
 	"\fPostListResp\x122\n" +
 	"\x05posts\x18\x01 \x03(\v2\x1c.rpc.proto.post.PostListItemR\x05posts\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total\"\xe1\x02\n" +
+	"\x05total\x18\x02 \x01(\x03R\x05total\"\xe1\x02\n" +
 	"\fPostListItem\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x18\n" +
 	"\asummary\x18\x02 \x01(\tR\asummary\x12\x17\n" +

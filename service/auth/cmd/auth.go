@@ -11,8 +11,8 @@ import (
 
 	"mono/gateway/initial"
 	authpb "mono/pb"
-	"mono/pkg/dbc"
 	"mono/service/auth/internal/interfaces"
+	"mono/service/auth/pkg"
 	"mono/service/auth/pkg/gen"
 )
 
@@ -24,12 +24,15 @@ var authCmd = &cobra.Command{
 	Use:   "rpc",
 	Short: "Auth application",
 	Run: func(cmd *cobra.Command, args []string) {
-		initial.Viper("service/auth/config.yaml")
+		initial.Viper(pkg.Module)
 		gen.InitSnow()
-		dbc.InitPgsql()
+		initial.Postgres()
 
-		db := dbc.GetDB()
-		lis, err := net.Listen("tcp", fmt.Sprintf(":%s", viper.GetString("port")))
+		db := initial.GetDB()
+		defer initial.CloseDB()
+		
+		port := viper.GetString("service.auth.port")
+		lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -41,7 +44,7 @@ var authCmd = &cobra.Command{
 			DB: db,
 		})
 
-		log.Println("grpc server listening on :9090")
+		log.Printf("grpc server listening on :%s", port)
 		if err := s.Serve(lis); err != nil {
 			log.Fatal(err)
 		}

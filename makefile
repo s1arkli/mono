@@ -11,3 +11,5 @@ auth_dal:
 	go run service/auth/main.go dal
 post_dal:
 	go run service/post/main.go dal
+user_dal:
+	go run service/user/main.go dal

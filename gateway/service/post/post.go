@@ -33,10 +33,10 @@ func List(c *gin.Context) {
 	}
 
 	resp, err := postClient.List(c, &postpb.PostListReq{
-		Page:       req.Page,
-		PageSize:   req.PageSize,
-		CategoryId: req.CategoryId,
-		Sort:       postpb.SortType(req.Sort),
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		PostType: req.PostType,
+		Sort:     postpb.SortType(req.Sort),
 	})
 	if err != nil {
 		response.Fail(c, ecode.New(1, err.Error()))
@@ -51,16 +51,21 @@ func List(c *gin.Context) {
 // @Tags         post
 // @Accept       json
 // @Produce      json
-// @Param        request  body  pb.PostCreateReq  true  "创建请求"
+// @Param        request  body  CreateReq  true  "创建请求"
 // @Router       /post/create [post]
 func Create(c *gin.Context) {
-	req := new(postpb.PostCreateReq)
+	req := new(CreateReq)
 	if err := c.ShouldBind(req); err != nil {
 		response.Fail(c, ecode.ParamErr)
 		return
 	}
 
-	resp, err := postClient.Create(c, req)
+	resp, err := postClient.Create(c, &postpb.PostCreateReq{
+		Uid:      req.Uid,
+		Title:    req.Title,
+		Content:  req.Content,
+		PostType: req.PostType,
+	})
 	if err != nil {
 		response.Fail(c, ecode.New(1, err.Error()))
 		return
@@ -74,16 +79,18 @@ func Create(c *gin.Context) {
 // @Tags         post
 // @Accept       json
 // @Produce      json
-// @Param        request  body  pb.PostDetailReq  true  "详情请求"
+// @Param        request  body  DetailReq  true  "详情请求"
 // @Router       /post/detail [post]
 func Detail(c *gin.Context) {
-	req := new(postpb.PostDetailReq)
+	req := new(DetailReq)
 	if err := c.ShouldBind(req); err != nil {
 		response.Fail(c, ecode.ParamErr)
 		return
 	}
 
-	resp, err := postClient.Detail(c, req)
+	resp, err := postClient.Detail(c, &postpb.PostDetailReq{
+		PostId: req.PostId,
+	})
 	if err != nil {
 		response.Fail(c, ecode.New(1, err.Error()))
 		return

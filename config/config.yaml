@@ -1,0 +1,11 @@
+pgsql:
+  user: "admin"
+  pwd: "123456"
+  port: "5432"
+service:
+  auth:
+    port: 9900
+  post:
+    port: 9910
+  user:
+    port: 9920

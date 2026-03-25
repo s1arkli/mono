@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package rpc.proto.user;
+
+option go_package = "mono/pb";
+
+message GetUserReq {
+  int64 uid = 1;
+}
+
+message GetUserResp {
+  int64 uid = 1;
+  string  nickname = 2;
+  string avatar = 3;
+}
+
+message BatchGetUserReq {
+  repeated int64 uids = 1;
+}
+
+message BatchGetUserResp {
+  map<int64,GetUserResp>  users = 1;
+}
+
+service User {
+  rpc GetUserInfo(GetUserReq) returns (GetUserResp);
+  rpc BatchGetUserInfo(BatchGetUserReq) returns (BatchGetUserResp);
+}

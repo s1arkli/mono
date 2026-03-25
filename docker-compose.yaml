@@ -1,0 +1,39 @@
+services:
+  gateway:
+    environment:
+      DB_HOST: pgsql
+    build:
+      context: . #在当前目录找dockerfile，以及项目文件
+      args:
+        SERVICE: gateway
+    ports:
+      - "9001:9001"
+
+  auth:
+    build:
+      context: .
+      args:
+        SERVICE: service/auth
+
+  post:
+    build:
+      context: .
+      args:
+        SERVICE: service/post
+
+  user:
+    build:
+      context: .
+      args:
+        SERVICE: service/user
+
+  pgsql:
+    image: postgres:18.1
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: mono
+    ports:
+      - "5432:5432"
+    volumes:
+      - /Users/cc/docker/pgsql:/var/lib/postgresql/data
