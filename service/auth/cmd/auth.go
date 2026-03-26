@@ -31,7 +31,7 @@ var authCmd = &cobra.Command{
 		db := initial.GetDB()
 		defer initial.CloseDB()
 
-		port := viper.GetString("service.token.port")
+		port := viper.GetString("service.auth.port")
 		lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 		if err != nil {
 			log.Fatal(err)

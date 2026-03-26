@@ -2,6 +2,7 @@ package auth
 
 import (
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
 
 	authpb "mono/pb"
 
@@ -9,13 +10,16 @@ import (
 	"mono/gateway/response"
 )
 
-var (
+type Service struct {
 	auth authpb.AuthServiceClient
-)
+	conn *grpc.ClientConn
+}
 
-func InitAuthClient() {
-	initAuthConn()
-	auth = authpb.NewAuthServiceClient(GetGrpcConn())
+func NewService(conn *grpc.ClientConn) *Service {
+	return &Service{
+		auth: authpb.NewAuthServiceClient(conn),
+		conn: conn,
+	}
 }
 
 // Register 注册
@@ -26,7 +30,7 @@ func InitAuthClient() {
 // @Produce      json
 // @Param        request  body  RegisterRequest  true  "注册请求"
 // @Router       /account/register [post]
-func Register(c *gin.Context) {
+func (s *Service) Register(c *gin.Context) {
 	req := new(RegisterRequest)
 
 	if err := c.ShouldBind(&req); err != nil {
@@ -34,7 +38,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	_, err := auth.Register(c, &authpb.RegisterReq{
+	_, err := s.auth.Register(c, &authpb.RegisterReq{
 		Account:  req.Account,
 		Password: req.Password,
 	})
@@ -53,7 +57,7 @@ func Register(c *gin.Context) {
 // @Produce      json
 // @Param        request  body  LoginRequest  true  "注册请求"
 // @Router       /account/login [post]
-func Login(c *gin.Context) {
+func (s *Service) Login(c *gin.Context) {
 	req := new(LoginRequest)
 
 	if err := c.ShouldBind(&req); err != nil {
@@ -61,7 +65,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	resp, err := auth.Login(c, &authpb.LoginReq{
+	resp, err := s.auth.Login(c, &authpb.LoginReq{
 		Account:  req.Account,
 		Password: req.Password,
 	})
@@ -82,14 +86,14 @@ func Login(c *gin.Context) {
 // @Produce      json
 // @Param        Cookie  header  string  true  "Bearer token"
 // @Router       /account/refresh [post]
-func Refresh(c *gin.Context) {
+func (s *Service) Refresh(c *gin.Context) {
 	rToken, err := c.Cookie("refresh_token")
 	if err != nil {
 		response.Fail(c, ecode.ParamErr)
 		return
 	}
 
-	resp, err := auth.Refresh(c, &authpb.RefreshReq{
+	resp, err := s.auth.Refresh(c, &authpb.RefreshReq{
 		RefreshToken: rToken,
 	})
 	if err != nil {

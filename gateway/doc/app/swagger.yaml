@@ -83,8 +83,6 @@ definitions:
     required:
     - page
     - pageSize
-    - postType
-    - sort
     type: object
 host: localhost:9999
 info:

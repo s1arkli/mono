@@ -4,8 +4,8 @@ type (
 	ListReq struct {
 		Page     int32 `json:"page" binding:"required,min=1,max=200"`
 		PageSize int32 `json:"pageSize" binding:"required,min=5,max=150"`
-		PostType int32 `json:"postType" binding:"required,oneof=0 1 2 3"`
-		Sort     int32 `json:"sort" binding:"required,oneof=0 1 2"`
+		PostType int32 `json:"postType" binding:"oneof=0 1 2 3"`
+		Sort     int32 `json:"sort" binding:"oneof=0 1 2"`
 	}
 
 	ListResp struct {

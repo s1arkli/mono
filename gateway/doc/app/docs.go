@@ -252,9 +252,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "page",
-                "pageSize",
-                "postType",
-                "sort"
+                "pageSize"
             ],
             "properties": {
                 "page": {

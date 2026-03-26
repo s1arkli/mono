@@ -15,6 +15,9 @@ user_dal:
 	go run service/user/main.go dal
 
 run: proto doc
+	docker-compose up
+
+build: proto doc
 	docker-compose up --build
 
 stop:

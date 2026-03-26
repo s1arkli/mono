@@ -58,12 +58,12 @@ services:
       environment:
         POSTGRES_USER: admin
         POSTGRES_PASSWORD: "123456"
-        POSTGRES_DB: token
+        POSTGRES_DB: auth
       ports:
         - "5432:5432"
       volumes:
         - pg_data:/var/lib/postgresql
-        - ./initial.sql:/docker-entrypoint-initdb.d/initial.sql
+        - ./init.sql:/docker-entrypoint-initdb.d/initial.sql
       healthcheck:
         test: [ "CMD-SHELL", "pg_isready -U admin -d auth" ]
         interval: 3s
