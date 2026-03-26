@@ -1,39 +1,74 @@
 services:
-  gateway:
-    environment:
-      DB_HOST: pgsql
-    build:
-      context: . #在当前目录找dockerfile，以及项目文件
-      args:
-        SERVICE: gateway
-    ports:
-      - "9001:9001"
+    gateway:
+      build:
+        context: . #在当前目录找dockerfile，以及项目文件
+        args:
+          SERVICE: gateway
+      command: ["./app", "api"]
+      ports:
+        - "9000:9000"
+      volumes:
+        - ./config/config.docker.yaml:/app/config/config.yaml
+      depends_on:
+        pgsql:
+          condition: service_healthy
 
-  auth:
-    build:
-      context: .
-      args:
-        SERVICE: service/auth
 
-  post:
-    build:
-      context: .
-      args:
-        SERVICE: service/post
+    auth:
+      build:
+        context: .
+        args:
+          SERVICE: service/auth
+      command: ["./app", "rpc"]
+      volumes:
+        - ./config/config.docker.yaml:/app/config/config.yaml
+      depends_on:
+        pgsql:
+          condition: service_healthy
 
-  user:
-    build:
-      context: .
-      args:
-        SERVICE: service/user
 
-  pgsql:
-    image: postgres:18.1
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: 123456
-      POSTGRES_DB: mono
-    ports:
-      - "5432:5432"
-    volumes:
-      - /Users/cc/docker/pgsql:/var/lib/postgresql/data
+    post:
+      build:
+        context: .
+        args:
+          SERVICE: service/post
+      command: ["./app", "rpc"]
+      volumes:
+        - ./config/config.docker.yaml:/app/config/config.yaml
+      depends_on:
+        pgsql:
+          condition: service_healthy
+
+
+    user:
+      build:
+        context: .
+        args:
+          SERVICE: service/user
+      command: ["./app", "rpc"]
+      volumes:
+        - ./config/config.docker.yaml:/app/config/config.yaml
+      depends_on:
+        pgsql:
+          condition: service_healthy
+
+
+    pgsql:
+      image: postgres:18.1
+      environment:
+        POSTGRES_USER: admin
+        POSTGRES_PASSWORD: "123456"
+        POSTGRES_DB: token
+      ports:
+        - "5432:5432"
+      volumes:
+        - pg_data:/var/lib/postgresql
+        - ./initial.sql:/docker-entrypoint-initdb.d/initial.sql
+      healthcheck:
+        test: [ "CMD-SHELL", "pg_isready -U admin -d auth" ]
+        interval: 3s
+        timeout: 3s
+        retries: 10
+
+volumes:
+  pg_data:

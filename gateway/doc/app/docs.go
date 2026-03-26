@@ -87,30 +87,212 @@ const docTemplate = `{
                 ],
                 "responses": {}
             }
+        },
+        "/post/create": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "post"
+                ],
+                "parameters": [
+                    {
+                        "description": "创建请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/post.CreateReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/post/detail": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "post"
+                ],
+                "parameters": [
+                    {
+                        "description": "详情请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/post.DetailReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/post/list": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "post"
+                ],
+                "parameters": [
+                    {
+                        "description": "列表请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/post.ListReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
         }
     },
     "definitions": {
         "auth.LoginRequest": {
             "type": "object",
+            "required": [
+                "account",
+                "password"
+            ],
             "properties": {
                 "account": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6
                 }
             }
         },
         "auth.RegisterRequest": {
             "type": "object",
+            "required": [
+                "account",
+                "password"
+            ],
             "properties": {
                 "account": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6
                 }
             }
+        },
+        "post.CreateReq": {
+            "type": "object",
+            "required": [
+                "content",
+                "post_type",
+                "title"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                },
+                "post_type": {
+                    "type": "integer",
+                    "enum": [
+                        0,
+                        1,
+                        2,
+                        3
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 1
+                }
+            }
+        },
+        "post.DetailReq": {
+            "type": "object",
+            "required": [
+                "postId"
+            ],
+            "properties": {
+                "postId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "post.ListReq": {
+            "type": "object",
+            "required": [
+                "page",
+                "pageSize",
+                "postType",
+                "sort"
+            ],
+            "properties": {
+                "page": {
+                    "type": "integer",
+                    "maximum": 200,
+                    "minimum": 1
+                },
+                "pageSize": {
+                    "type": "integer",
+                    "maximum": 150,
+                    "minimum": 5
+                },
+                "postType": {
+                    "type": "integer",
+                    "enum": [
+                        0,
+                        1,
+                        2,
+                        3
+                    ]
+                },
+                "sort": {
+                    "type": "integer",
+                    "enum": [
+                        0,
+                        1,
+                        2
+                    ]
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "请输入 Bearer access_token",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

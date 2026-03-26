@@ -6,6 +6,7 @@ import (
 	"mono/gateway/ecode"
 	"mono/gateway/response"
 	postpb "mono/pb"
+	"mono/pkg/token"
 )
 
 var (
@@ -51,6 +52,7 @@ func List(c *gin.Context) {
 // @Tags         post
 // @Accept       json
 // @Produce      json
+// @Security     BearerAuth
 // @Param        request  body  CreateReq  true  "创建请求"
 // @Router       /post/create [post]
 func Create(c *gin.Context) {
@@ -61,7 +63,7 @@ func Create(c *gin.Context) {
 	}
 
 	resp, err := postClient.Create(c, &postpb.PostCreateReq{
-		Uid:      req.Uid,
+		Uid:      token.GetUserID(c),
 		Title:    req.Title,
 		Content:  req.Content,
 		PostType: req.PostType,

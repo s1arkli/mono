@@ -1,6 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from 'react'
 import { login, register } from './api/auth'
+import { createPost, fetchPostList } from './api/post'
+import { LogPanel } from './components/LogPanel'
 import { Toast, type ToastState } from './components/Toast'
+import { appLogger, useBrowserLogBridge } from './lib/logger'
+import type { PostListItemDTO } from './types/api'
 
 type AuthMode = 'login' | 'register'
 type PageMode = 'forum-guest' | 'forum-member' | 'auth'
@@ -28,7 +32,7 @@ interface PostItem {
   id: number
   author: string
   time: string
-  topic: Exclude<Topic, 'all'>
+  topic: Exclude<Topic, 'all'> | null
   title: string
   excerpt: string
   avatar: string
@@ -40,7 +44,7 @@ const contentMap: Record<AuthMode, CopyContent> = {
     heroTitle: '先登录，再进入你的工作空间。',
     formTitle: '欢迎回来',
     formSubtitle: '使用你的 mono 账号登录',
-    hint: '登录成功后会先给出成功提示，页面跳转在后续业务开发阶段再接入。',
+    hint: '登录成功后会直接进入帖子页，并带上 access token 继续联调受保护接口。',
     button: '登录',
     footPrefix: '还没有账号？',
     footAction: '立即注册',
@@ -49,7 +53,7 @@ const contentMap: Record<AuthMode, CopyContent> = {
     heroTitle: '创建账号，进入 mono 的受保护体验。',
     formTitle: '创建你的账号',
     formSubtitle: '仅需几步，即可进入登录后的工作页面',
-    hint: '注册成功后只弹提示，不立即跳转，便于后续按真实业务再接页面流转。',
+    hint: '注册成功后保留在当前页，便于你继续验证登录接口是否正常。',
     button: '创建账号',
     footPrefix: '已经有账号？',
     footAction: '去登录',
@@ -69,130 +73,18 @@ const topicLabels: Record<Exclude<Topic, 'all'>, string> = {
   chat: '灌水',
 }
 
-const feedMap: Record<'guest' | 'member', { defaultTopic: Topic; defaultSort: SortMode; posts: PostItem[] }> = {
+const forumDefaults: Record<'guest' | 'member', { topic: Topic; sort: SortMode }> = {
   guest: {
-    defaultTopic: 'all',
-    defaultSort: 'latest',
-    posts: [
-      {
-        id: 1,
-        author: '阿泽',
-        time: '3 小时前',
-        topic: 'tech',
-        title: 'Go 服务里 context 该传到哪一层才合适？',
-        excerpt:
-          '最近在整理项目分层，handler、service、repo 都在传 context。想请教一下，哪些场景必须往下透传，哪些地方传了反而让代码变得别扭？',
-        avatar: '#CBD5E1',
-        stats: { likes: '128', comments: '34', views: '1.2k', favorites: '56' },
-      },
-      {
-        id: 2,
-        author: 'Lin',
-        time: '5 小时前',
-        topic: 'life',
-        title: '你们现在还会坚持写周报吗？',
-        excerpt:
-          '团队从 8 个人扩到 20 个人后，我发现异步信息越来越碎。周报虽然土，但好像还是最省沟通成本的方式。',
-        avatar: '#BFDBFE',
-        stats: { likes: '87', comments: '19', views: '680', favorites: '21' },
-      },
-      {
-        id: 3,
-        author: '大刘',
-        time: '昨天',
-        topic: 'chat',
-        title: '分享一个最近很有用的终端小工具',
-        excerpt:
-          '它不是那种功能堆满的效率软件，只有几个命令，但把我每天重复的日志检索和端口检查都省掉了。',
-        avatar: '#DDD6FE',
-        stats: { likes: '204', comments: '42', views: '2.4k', favorites: '73' },
-      },
-      {
-        id: 4,
-        author: 'Mika',
-        time: '2 天前',
-        topic: 'tech',
-        title: '为什么我越来越倾向先写最小可运行版本？',
-        excerpt:
-          '之前做需求总想一步到位，结果返工最多。现在更愿意先把核心链路跑通，再慢慢补体验和边界处理，反而整体更稳。',
-        avatar: '#FDE68A',
-        stats: { likes: '152', comments: '27', views: '930', favorites: '48' },
-      },
-      {
-        id: 5,
-        author: '小棠',
-        time: '3 天前',
-        topic: 'life',
-        title: '第一次带实习生，有什么低成本但有效的方法？',
-        excerpt:
-          '我不想一上来就把流程搞得很重，但也怕对方没有方向。大家有没有那种真的能落地、不会增加太多管理负担的做法？',
-        avatar: '#FBCFE8',
-        stats: { likes: '64', comments: '15', views: '510', favorites: '18' },
-      },
-    ],
+    topic: 'all',
+    sort: 'latest',
   },
   member: {
-    defaultTopic: 'tech',
-    defaultSort: 'hot',
-    posts: [
-      {
-        id: 6,
-        author: '河图',
-        time: '刚刚',
-        topic: 'tech',
-        title: '生产环境里怎么排查偶发性的超时问题？',
-        excerpt:
-          '接口平均耗时一直正常，但每天会出现几次 3 到 5 秒的抖动。现在准备从日志、链路追踪和数据库慢查询三个方向一起看。',
-        avatar: '#BFDBFE',
-        stats: { likes: '312', comments: '68', views: '3.8k', favorites: '104' },
-      },
-      {
-        id: 7,
-        author: 'Sean',
-        time: '28 分钟前',
-        topic: 'tech',
-        title: '关于 Go 1.25 新特性，大家最关注哪一块？',
-        excerpt:
-          '我自己最关心的还是性能剖析链路和工具链体验。如果升级成本不高，很多团队今年应该都会逐步跟上。',
-        avatar: '#C7D2FE',
-        stats: { likes: '196', comments: '53', views: '2.1k', favorites: '66' },
-      },
-      {
-        id: 8,
-        author: '阿珍',
-        time: '1 小时前',
-        topic: 'life',
-        title: '远程团队里，大家怎么维持“人在现场”的感觉？',
-        excerpt:
-          '不是说天天开会，而是那种遇到事情能快速被看见、被接住的协作感。最近我们在试更轻量的日报和异步语音。',
-        avatar: '#FDE68A',
-        stats: { likes: '143', comments: '31', views: '1.1k', favorites: '29' },
-      },
-      {
-        id: 9,
-        author: 'Box',
-        time: '2 小时前',
-        topic: 'chat',
-        title: '最近谁还在坚持写长文档？',
-        excerpt:
-          '我发现很多讨论在聊天工具里很快就沉了，真正需要复盘的时候，还是一篇结构完整的文档最能救命。',
-        avatar: '#FBCFE8',
-        stats: { likes: '88', comments: '22', views: '760', favorites: '25' },
-      },
-      {
-        id: 10,
-        author: 'Yuna',
-        time: '4 小时前',
-        topic: 'tech',
-        title: '大家的代码评审现在还有人认真写评论吗？',
-        excerpt:
-          '我们团队最近在反思，很多 Review 只剩“LGTM”。是不是该把关注点重新放回设计意图和风险说明？',
-        avatar: '#A7F3D0',
-        stats: { likes: '221', comments: '45', views: '1.9k', favorites: '59' },
-      },
-    ],
+    topic: 'tech',
+    sort: 'hot',
   },
 }
+
+const avatarFallbacks = ['#CBD5E1', '#BFDBFE', '#DDD6FE', '#FDE68A', '#FBCFE8', '#A7F3D0']
 
 function validate(mode: AuthMode, account: string, password: string) {
   const cleanedAccount = account.trim()
@@ -211,6 +103,99 @@ function validate(mode: AuthMode, account: string, password: string) {
   }
 
   return ''
+}
+
+function formatCount(value: number) {
+  if (value >= 1000) {
+    return `${(value / 1000).toFixed(value >= 10000 ? 0 : 1)}k`
+  }
+  return String(value)
+}
+
+function formatRelativeTime(unixSeconds: number) {
+  if (!unixSeconds) {
+    return '刚刚'
+  }
+
+  const diff = Date.now() - unixSeconds * 1000
+  const minute = 60 * 1000
+  const hour = 60 * minute
+  const day = 24 * hour
+
+  if (diff < minute) {
+    return '刚刚'
+  }
+  if (diff < hour) {
+    return `${Math.max(1, Math.floor(diff / minute))} 分钟前`
+  }
+  if (diff < day) {
+    return `${Math.max(1, Math.floor(diff / hour))} 小时前`
+  }
+  if (diff < 7 * day) {
+    return `${Math.max(1, Math.floor(diff / day))} 天前`
+  }
+
+  return new Date(unixSeconds * 1000).toLocaleDateString('zh-CN', {
+    month: 'numeric',
+    day: 'numeric',
+  })
+}
+
+function getPostTypeByTopic(topic: Topic) {
+  if (topic === 'tech') {
+    return 1
+  }
+  if (topic === 'life') {
+    return 2
+  }
+  if (topic === 'chat') {
+    return 3
+  }
+  return 0
+}
+
+function getSortValue(sortMode: SortMode) {
+  if (sortMode === 'hot') {
+    return 1
+  }
+  return 2
+}
+
+function buildAvatarStyle(avatar: string, seed: number): CSSProperties {
+  const fallback = avatarFallbacks[Math.abs(seed) % avatarFallbacks.length]
+
+  if (!avatar) {
+    return { background: fallback }
+  }
+
+  if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
+    return {
+      backgroundColor: fallback,
+      backgroundImage: `url("${avatar}")`,
+      backgroundPosition: 'center',
+      backgroundSize: 'cover',
+    }
+  }
+
+  return { background: avatar }
+}
+
+function mapPostItem(item: PostListItemDTO, topic: Topic): PostItem {
+  return {
+    id: item.post_id,
+    author: item.nickname || `用户 ${item.uid}`,
+    time: formatRelativeTime(item.created_at),
+    topic: topic === 'all' ? null : topic,
+    title: item.title,
+    excerpt: item.summary || '这篇帖子还没有摘要。',
+    avatar: item.avatar,
+    stats: {
+      likes: formatCount(item.like_count),
+      comments: formatCount(item.comment_count),
+      views: formatCount(item.view_count),
+      favorites: formatCount(item.collect_count),
+    },
+  }
 }
 
 function SearchIcon() {
@@ -321,25 +306,208 @@ function StatIcon({ type }: { type: 'like' | 'comment' | 'view' | 'favorite' }) 
 
 function ForumHome({
   mode,
+  accessToken,
   onOpenAuth,
+  onLogout,
+  onToast,
 }: {
   mode: 'guest' | 'member'
+  accessToken: string | null
   onOpenAuth: (next: PageMode) => void
+  onLogout: () => void
+  onToast: (toast: ToastState) => void
 }) {
-  const [topic, setTopic] = useState<Topic>(feedMap[mode].defaultTopic)
-  const [sortMode, setSortMode] = useState<SortMode>(feedMap[mode].defaultSort)
+  const [topic, setTopic] = useState<Topic>(forumDefaults[mode].topic)
+  const [sortMode, setSortMode] = useState<SortMode>(forumDefaults[mode].sort)
   const [menuOpen, setMenuOpen] = useState(false)
-  const currentFeed = feedMap[mode]
+  const [keyword, setKeyword] = useState('')
+  const [posts, setPosts] = useState<PostItem[]>([])
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+  const [reloadSeed, setReloadSeed] = useState(0)
+  const [composerOpen, setComposerOpen] = useState(false)
+  const [draftTitle, setDraftTitle] = useState('')
+  const [draftContent, setDraftContent] = useState('')
+  const [draftTopic, setDraftTopic] = useState<Exclude<Topic, 'all'>>('tech')
+  const [creating, setCreating] = useState(false)
 
   useEffect(() => {
-    setTopic(currentFeed.defaultTopic)
-    setSortMode(currentFeed.defaultSort)
+    setTopic(forumDefaults[mode].topic)
+    setSortMode(forumDefaults[mode].sort)
     setMenuOpen(false)
-  }, [currentFeed.defaultSort, currentFeed.defaultTopic])
+    setComposerOpen(false)
+    setKeyword('')
+    appLogger.log({
+      level: 'info',
+      category: 'ui',
+      action: 'forum_mode_ready',
+      message: `论坛页已切到 ${mode === 'member' ? '登录态' : '游客态'} 视图`,
+      context: { mode },
+    })
+  }, [mode])
+
+  useEffect(() => {
+    if (!keyword.trim()) {
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      appLogger.log({
+        level: 'info',
+        category: 'ui',
+        action: 'post_search',
+        message: '更新帖子搜索关键字',
+        context: { keyword },
+      })
+    }, 450)
+
+    return () => window.clearTimeout(timer)
+  }, [keyword])
+
+  useEffect(() => {
+    let canceled = false
+
+    async function loadPosts() {
+      setLoading(true)
+      setLoadError('')
+
+      try {
+        const resp = await fetchPostList({
+          page: 1,
+          pageSize: 10,
+          postType: getPostTypeByTopic(topic),
+          sort: getSortValue(sortMode),
+        })
+
+        if (canceled) {
+          return
+        }
+
+        setPosts((resp.posts ?? []).map((item) => mapPostItem(item, topic)))
+        setTotal(resp.total ?? 0)
+      } catch (error) {
+        if (canceled) {
+          return
+        }
+
+        setPosts([])
+        setTotal(0)
+        setLoadError(error instanceof Error ? error.message : '帖子加载失败')
+      } finally {
+        if (!canceled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadPosts()
+
+    return () => {
+      canceled = true
+    }
+  }, [topic, sortMode, reloadSeed])
 
   const visiblePosts = useMemo(() => {
-    return currentFeed.posts.filter((post) => topic === 'all' || post.topic === topic)
-  }, [currentFeed.posts, topic])
+    const search = keyword.trim().toLowerCase()
+    if (!search) {
+      return posts
+    }
+
+    return posts.filter((post) => {
+      return post.title.toLowerCase().includes(search) || post.excerpt.toLowerCase().includes(search)
+    })
+  }, [keyword, posts])
+
+  async function handleCreatePost(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    if (!accessToken) {
+      appLogger.log({
+        level: 'warn',
+        category: 'post',
+        action: 'create_requires_login',
+        message: '当前未登录，发帖前需要先完成登录',
+      })
+      onToast({ type: 'error', message: '当前没有登录态，请先登录后再发帖。' })
+      onOpenAuth('auth')
+      return
+    }
+
+    if (!draftTitle.trim()) {
+      appLogger.log({
+        level: 'warn',
+        category: 'post',
+        action: 'create_validation_failed',
+        message: '发帖校验失败：标题为空',
+      })
+      onToast({ type: 'error', message: '请输入帖子标题。' })
+      return
+    }
+
+    if (!draftContent.trim()) {
+      appLogger.log({
+        level: 'warn',
+        category: 'post',
+        action: 'create_validation_failed',
+        message: '发帖校验失败：内容为空',
+      })
+      onToast({ type: 'error', message: '请输入帖子内容。' })
+      return
+    }
+
+    setCreating(true)
+    appLogger.log({
+      level: 'info',
+      category: 'post',
+      action: 'create_submit',
+      message: '提交发帖请求',
+      context: {
+        title: draftTitle.trim(),
+        topic: draftTopic,
+        contentLength: draftContent.trim().length,
+      },
+    })
+
+    try {
+      await createPost(
+        {
+          title: draftTitle.trim(),
+          content: draftContent.trim(),
+          post_type: getPostTypeByTopic(draftTopic),
+        },
+        accessToken,
+      )
+
+      setDraftTitle('')
+      setDraftContent('')
+      setDraftTopic('tech')
+      setComposerOpen(false)
+      setReloadSeed((seed) => seed + 1)
+      appLogger.log({
+        level: 'success',
+        category: 'post',
+        action: 'create_success',
+        message: '发帖成功',
+        context: { topic: draftTopic, title: draftTitle.trim() },
+      })
+      onToast({ type: 'success', message: '发帖成功，列表已刷新。' })
+    } catch (error) {
+      appLogger.log({
+        level: 'error',
+        category: 'post',
+        action: 'create_failed',
+        message: '发帖失败',
+        context: error,
+      })
+      onToast({
+        type: 'error',
+        message: error instanceof Error ? error.message : '发帖失败，请稍后再试',
+      })
+    } finally {
+      setCreating(false)
+    }
+  }
 
   return (
     <div className={`forum-page forum-page--${mode}`}>
@@ -352,7 +520,12 @@ function ForumHome({
 
           <label className="forum-search" aria-label="搜索帖子">
             <SearchIcon />
-            <input defaultValue="" placeholder="搜索帖子..." type="text" />
+            <input
+              onChange={(event) => setKeyword(event.target.value)}
+              placeholder="搜索帖子标题或摘要..."
+              type="text"
+              value={keyword}
+            />
           </label>
 
           {mode === 'guest' ? (
@@ -370,9 +543,9 @@ function ForumHome({
             </div>
           ) : (
             <div className="forum-member-actions">
-              <button className="forum-pill-button" type="button">
+              <button className="forum-pill-button" onClick={() => setComposerOpen((open) => !open)} type="button">
                 <PlusIcon />
-                <span>发帖</span>
+                <span>{composerOpen ? '收起发帖' : '发帖'}</span>
               </button>
 
               <div className="forum-member-menu">
@@ -388,13 +561,17 @@ function ForumHome({
 
                 {menuOpen ? (
                   <div className="forum-member-menu__panel">
-                    <button className="forum-menu-item" type="button">
-                      个人主页
+                    <button className="forum-menu-item" onClick={() => setReloadSeed((seed) => seed + 1)} type="button">
+                      刷新帖子
                     </button>
-                    <button className="forum-menu-item" type="button">
-                      我的帖子
+                    <button className="forum-menu-item" onClick={() => setComposerOpen(true)} type="button">
+                      新建帖子
                     </button>
-                    <button className="forum-menu-item forum-menu-item--danger" onClick={() => onOpenAuth('forum-guest')} type="button">
+                    <button
+                      className="forum-menu-item forum-menu-item--danger"
+                      onClick={onLogout}
+                      type="button"
+                    >
                       退出登录
                     </button>
                   </div>
@@ -406,6 +583,53 @@ function ForumHome({
 
         <main className="forum-content-wrap">
           <section className="forum-feed-panel">
+            {mode === 'member' && composerOpen ? (
+              <form className="forum-composer" onSubmit={handleCreatePost}>
+                <div className="forum-composer__heading">
+                  <h3>发布新帖</h3>
+                  <p>当前走真实后端接口，创建成功后会刷新当前列表。</p>
+                </div>
+
+                <div className="forum-composer__row">
+                  <input
+                    className="forum-composer__input"
+                    disabled={creating}
+                    maxLength={100}
+                    onChange={(event) => setDraftTitle(event.target.value)}
+                    placeholder="输入帖子标题"
+                    value={draftTitle}
+                  />
+
+                  <select
+                    className="forum-composer__select"
+                    disabled={creating}
+                    onChange={(event) => setDraftTopic(event.target.value as Exclude<Topic, 'all'>)}
+                    value={draftTopic}
+                  >
+                    <option value="tech">技术</option>
+                    <option value="life">生活</option>
+                    <option value="chat">灌水</option>
+                  </select>
+                </div>
+
+                <textarea
+                  className="forum-composer__textarea"
+                  disabled={creating}
+                  maxLength={1000}
+                  onChange={(event) => setDraftContent(event.target.value)}
+                  placeholder="写点内容，验证 create 接口..."
+                  value={draftContent}
+                />
+
+                <div className="forum-composer__actions">
+                  <span>{draftContent.trim().length}/1000</span>
+                  <button className="forum-pill-button" disabled={creating} type="submit">
+                    {creating ? '发布中...' : '确认发布'}
+                  </button>
+                </div>
+              </form>
+            ) : null}
+
             <div className="forum-tabs" role="tablist" aria-label="帖子分类">
               {topicOptions.map((item) => {
                 const active = item.key === topic
@@ -414,7 +638,16 @@ function ForumHome({
                     aria-selected={active}
                     className={active ? 'forum-tab is-active' : 'forum-tab'}
                     key={item.key}
-                    onClick={() => setTopic(item.key)}
+                    onClick={() => {
+                      setTopic(item.key)
+                      appLogger.log({
+                        level: 'info',
+                        category: 'ui',
+                        action: 'topic_change',
+                        message: '切换帖子分类',
+                        context: { topic: item.key },
+                      })
+                    }}
                     role="tab"
                     type="button"
                   >
@@ -429,14 +662,30 @@ function ForumHome({
               <div className="forum-filters__group" aria-label="排序切换">
                 <button
                   className={sortMode === 'latest' ? 'forum-filter is-active' : 'forum-filter'}
-                  onClick={() => setSortMode('latest')}
+                  onClick={() => {
+                    setSortMode('latest')
+                    appLogger.log({
+                      level: 'info',
+                      category: 'ui',
+                      action: 'sort_change',
+                      message: '切换帖子排序为最新',
+                    })
+                  }}
                   type="button"
                 >
                   最新
                 </button>
                 <button
                   className={sortMode === 'hot' ? 'forum-filter is-active' : 'forum-filter'}
-                  onClick={() => setSortMode('hot')}
+                  onClick={() => {
+                    setSortMode('hot')
+                    appLogger.log({
+                      level: 'info',
+                      category: 'ui',
+                      action: 'sort_change',
+                      message: '切换帖子排序为最热',
+                    })
+                  }}
                   type="button"
                 >
                   最热
@@ -445,45 +694,68 @@ function ForumHome({
             </div>
 
             <div className="forum-post-list">
-              {visiblePosts.map((post) => (
-                <article className="forum-post-card" key={post.id}>
-                  <div className="forum-post-card__meta">
-                    <div className="forum-author">
-                      <span className="forum-author__avatar" style={{ background: post.avatar }} />
-                      <div className="forum-author__info">
-                        <span className="forum-author__name">{post.author}</span>
-                        <span className="forum-author__time">{post.time}</span>
+              {loading ? <div className="forum-state-panel">正在加载帖子列表...</div> : null}
+
+              {!loading && loadError ? (
+                <div className="forum-state-panel forum-state-panel--error">
+                  <p>{loadError}</p>
+                  <button className="forum-pill-button forum-pill-button--ghost" onClick={() => setReloadSeed((seed) => seed + 1)} type="button">
+                    重试
+                  </button>
+                </div>
+              ) : null}
+
+              {!loading && !loadError && visiblePosts.length === 0 ? (
+                <div className="forum-state-panel">
+                  {keyword.trim() ? '没有匹配的帖子。' : '当前分类下还没有帖子。'}
+                </div>
+              ) : null}
+
+              {!loading && !loadError
+                ? visiblePosts.map((post) => (
+                    <article className="forum-post-card" key={post.id}>
+                      <div className="forum-post-card__meta">
+                        <div className="forum-author">
+                          <span className="forum-author__avatar" style={buildAvatarStyle(post.avatar, post.id)} />
+                          <div className="forum-author__info">
+                            <span className="forum-author__name">{post.author}</span>
+                            <span className="forum-author__time">{post.time}</span>
+                          </div>
+                        </div>
+
+                        {post.topic ? (
+                          <span className={`forum-topic-badge forum-topic-badge--${post.topic}`}>{topicLabels[post.topic]}</span>
+                        ) : null}
                       </div>
-                    </div>
 
-                    <span className={`forum-topic-badge forum-topic-badge--${post.topic}`}>{topicLabels[post.topic]}</span>
-                  </div>
+                      <h2 className="forum-post-card__title">{post.title}</h2>
+                      <p className="forum-post-card__excerpt">{post.excerpt}</p>
 
-                  <h2 className="forum-post-card__title">{post.title}</h2>
-                  <p className="forum-post-card__excerpt">{post.excerpt}</p>
+                      <div className="forum-stats-row">
+                        <div className="forum-stat-item">
+                          <StatIcon type="like" />
+                          <span>{post.stats.likes}</span>
+                        </div>
+                        <div className="forum-stat-item">
+                          <StatIcon type="comment" />
+                          <span>{post.stats.comments}</span>
+                        </div>
+                        <div className="forum-stat-item">
+                          <StatIcon type="view" />
+                          <span>{post.stats.views}</span>
+                        </div>
+                        <div className="forum-stat-item">
+                          <StatIcon type="favorite" />
+                          <span>{post.stats.favorites}</span>
+                        </div>
+                      </div>
+                    </article>
+                  ))
+                : null}
 
-                  <div className="forum-stats-row">
-                    <div className="forum-stat-item">
-                      <StatIcon type="like" />
-                      <span>{post.stats.likes}</span>
-                    </div>
-                    <div className="forum-stat-item">
-                      <StatIcon type="comment" />
-                      <span>{post.stats.comments}</span>
-                    </div>
-                    <div className="forum-stat-item">
-                      <StatIcon type="view" />
-                      <span>{post.stats.views}</span>
-                    </div>
-                    <div className="forum-stat-item">
-                      <StatIcon type="favorite" />
-                      <span>{post.stats.favorites}</span>
-                    </div>
-                  </div>
-                </article>
-              ))}
-
-              <div className="forum-load-more">加载更多...</div>
+              {!loading && !loadError ? (
+                <div className="forum-load-more">{keyword.trim() ? `筛选后 ${visiblePosts.length} 篇` : `当前共 ${total} 篇`}</div>
+              ) : null}
             </div>
           </section>
         </main>
@@ -493,6 +765,8 @@ function ForumHome({
 }
 
 export default function App() {
+  useBrowserLogBridge()
+
   const [pageMode, setPageMode] = useState<PageMode>('forum-guest')
   const [mode, setMode] = useState<AuthMode>('login')
   const [account, setAccount] = useState('')
@@ -500,11 +774,21 @@ export default function App() {
   const [agree, setAgree] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [toast, setToast] = useState<ToastState | null>(null)
+  const [accessToken, setAccessToken] = useState<string | null>(null)
   const [transitionStage, setTransitionStage] = useState<'idle' | 'leaving' | 'entering'>('idle')
   const switchTimerRef = useRef<number | null>(null)
   const enterTimerRef = useRef<number | null>(null)
 
   const copy = useMemo(() => contentMap[mode], [mode])
+
+  useEffect(() => {
+    appLogger.log({
+      level: 'info',
+      category: 'system',
+      action: 'app_boot',
+      message: '前端应用已启动',
+    })
+  }, [])
 
   useEffect(() => {
     if (!toast) {
@@ -527,30 +811,68 @@ export default function App() {
     }
   }, [])
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    appLogger.log({
+      level: 'info',
+      category: 'ui',
+      action: 'page_mode_change',
+      message: '页面模式发生变化',
+      context: { pageMode },
+    })
+  }, [pageMode])
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const message = validate(mode, account, password)
     if (message) {
+      appLogger.log({
+        level: 'warn',
+        category: 'auth',
+        action: 'auth_validation_failed',
+        message,
+        context: { mode, account: account.trim() },
+      })
       setToast({ type: 'error', message })
       return
     }
 
     if (mode === 'register' && !agree) {
+      appLogger.log({
+        level: 'warn',
+        category: 'auth',
+        action: 'register_agreement_required',
+        message: '注册被拦截，用户未勾选服务条款',
+      })
       setToast({ type: 'error', message: '请先确认服务条款与隐私说明' })
       return
     }
 
     setSubmitting(true)
+    appLogger.log({
+      level: 'info',
+      category: 'auth',
+      action: mode === 'login' ? 'login_submit' : 'register_submit',
+      message: mode === 'login' ? '提交登录请求' : '提交注册请求',
+      context: { account: account.trim() },
+    })
 
     try {
       if (mode === 'login') {
-        await login({
+        const token = await login({
           account: account.trim(),
           password,
         })
 
-        setToast({ type: 'success', message: '登录成功，接口联调已通过。' })
+        setAccessToken(token)
+        appLogger.log({
+          level: 'success',
+          category: 'auth',
+          action: 'login_success',
+          message: '登录成功并已写入 access token',
+          context: { account: account.trim() },
+        })
+        setToast({ type: 'success', message: '登录成功，已切到真实帖子列表。' })
         setPageMode('forum-member')
       } else {
         await register({
@@ -558,9 +880,24 @@ export default function App() {
           password,
         })
 
-        setToast({ type: 'success', message: '注册成功，当前先保留在本页提示。' })
+        appLogger.log({
+          level: 'success',
+          category: 'auth',
+          action: 'register_success',
+          message: '注册成功',
+          context: { account: account.trim() },
+        })
+        setToast({ type: 'success', message: '注册成功，现在可以直接登录验证。' })
+        setMode('login')
       }
     } catch (error) {
+      appLogger.log({
+        level: 'error',
+        category: 'auth',
+        action: mode === 'login' ? 'login_failed' : 'register_failed',
+        message: mode === 'login' ? '登录失败' : '注册失败',
+        context: error,
+      })
       const message = error instanceof Error ? error.message : '请求失败，请稍后再试'
       setToast({ type: 'error', message })
     } finally {
@@ -574,6 +911,13 @@ export default function App() {
     }
 
     setToast(null)
+    appLogger.log({
+      level: 'info',
+      category: 'ui',
+      action: 'auth_mode_change',
+      message: '切换认证模式',
+      context: { from: mode, to: nextMode },
+    })
     setTransitionStage('leaving')
 
     if (switchTimerRef.current) {
@@ -594,11 +938,24 @@ export default function App() {
     }, 170)
   }
 
+  function handleLogout() {
+    setAccessToken(null)
+    setPageMode('forum-guest')
+    appLogger.log({
+      level: 'info',
+      category: 'auth',
+      action: 'logout',
+      message: '用户主动退出登录',
+    })
+    setToast({ type: 'success', message: '已退出登录。' })
+  }
+
   if (pageMode === 'forum-guest') {
     return (
       <>
         <Toast toast={toast} />
-        <ForumHome mode="guest" onOpenAuth={setPageMode} />
+        <ForumHome accessToken={accessToken} mode="guest" onLogout={handleLogout} onOpenAuth={setPageMode} onToast={setToast} />
+        <LogPanel />
       </>
     )
   }
@@ -607,7 +964,8 @@ export default function App() {
     return (
       <>
         <Toast toast={toast} />
-        <ForumHome mode="member" onOpenAuth={setPageMode} />
+        <ForumHome accessToken={accessToken} mode="member" onLogout={handleLogout} onOpenAuth={setPageMode} onToast={setToast} />
+        <LogPanel />
       </>
     )
   }
@@ -615,6 +973,7 @@ export default function App() {
   return (
     <div className={`app app--${mode}`}>
       <Toast toast={toast} />
+      <LogPanel />
       <header className="topbar">
         <button className="brand brand--home" onClick={() => setPageMode('forum-guest')} type="button">
           mono
@@ -680,8 +1039,8 @@ export default function App() {
 
             {mode === 'login' ? (
               <div className="meta-row">
-                <span>忘记密码？</span>
-                <span className="meta-row__link">需要帮助</span>
+                <span>登录成功后会进入真实帖子页</span>
+                <span className="meta-row__link">当前不在页面层读取 refresh token</span>
               </div>
             ) : (
               <label className="agreement">

@@ -69,7 +69,9 @@ func Login(c *gin.Context) {
 		response.Fail(c, ecode.New(1, err.Error()))
 		return
 	}
-	response.Success(c, resp)
+
+	c.SetCookie("refresh_token", resp.RefreshToken, 7*24*3600, "/api/v1/account/refresh", "", true, true)
+	response.Success(c, resp.AccessToken)
 }
 
 // Refresh 刷新token
@@ -91,12 +93,12 @@ func Refresh(c *gin.Context) {
 		RefreshToken: rToken,
 	})
 	if err != nil {
-		c.SetCookie("refresh_token", "", -1, "/api/auth", "", true, true)
+		c.SetCookie("refresh_token", "", -1, "/api/v1/account/refresh", "", true, true)
 		response.Fail(c, ecode.New(1, err.Error()))
 		return
 	}
 
-	c.SetCookie("refresh_token", resp.RefreshToken, 7*24*3600, "/account/refresh", "", true, true)
+	c.SetCookie("refresh_token", resp.RefreshToken, 7*24*3600, "/api/v1/account/refresh", "", true, true)
 
 	response.Success(c, resp.AccessToken)
 }

@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 
-	"mono/gateway/initial"
 	authpb "mono/pb"
+	"mono/pkg/initial"
 	"mono/service/auth/internal/interfaces"
 	"mono/service/auth/pkg"
 	"mono/service/auth/pkg/gen"
@@ -30,8 +30,8 @@ var authCmd = &cobra.Command{
 
 		db := initial.GetDB()
 		defer initial.CloseDB()
-		
-		port := viper.GetString("service.auth.port")
+
+		port := viper.GetString("service.token.port")
 		lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 		if err != nil {
 			log.Fatal(err)

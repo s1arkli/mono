@@ -10,8 +10,8 @@ import (
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 
-	"mono/gateway/initial"
 	"mono/pb"
+	"mono/pkg/initial"
 	"mono/service/user/internal/interfaces"
 	"mono/service/user/pkg"
 )
@@ -29,7 +29,7 @@ var userCmd = &cobra.Command{
 
 		db := initial.GetDB()
 		defer initial.CloseDB()
-		
+
 		port := viper.GetString("service.user.port")
 		listen, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 		if err != nil {

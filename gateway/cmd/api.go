@@ -7,10 +7,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"mono/gateway/initial"
 	"mono/gateway/router"
 	"mono/gateway/service/auth"
 	"mono/gateway/service/post"
+	"mono/pkg/initial"
 )
 
 func init() {
@@ -23,7 +23,7 @@ var apiCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		r := gin.Default()
 
-		initial.Viper("./gateway/config.yaml")
+		initial.Viper("gateway")
 		auth.InitAuthClient()
 		post.InitPostClient()
 

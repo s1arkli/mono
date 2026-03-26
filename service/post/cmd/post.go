@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 
-	"mono/gateway/initial"
 	"mono/pb"
+	"mono/pkg/initial"
 	"mono/service/post/internal/client"
 	"mono/service/post/internal/interfaces"
 	"mono/service/post/pkg"

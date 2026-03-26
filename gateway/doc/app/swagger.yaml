@@ -3,16 +3,88 @@ definitions:
   auth.LoginRequest:
     properties:
       account:
+        maxLength: 20
+        minLength: 6
         type: string
       password:
+        maxLength: 20
+        minLength: 6
         type: string
+    required:
+    - account
+    - password
     type: object
   auth.RegisterRequest:
     properties:
       account:
+        maxLength: 20
+        minLength: 6
         type: string
       password:
+        maxLength: 20
+        minLength: 6
         type: string
+    required:
+    - account
+    - password
+    type: object
+  post.CreateReq:
+    properties:
+      content:
+        maxLength: 1000
+        minLength: 1
+        type: string
+      post_type:
+        enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        type: integer
+      title:
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+    - content
+    - post_type
+    - title
+    type: object
+  post.DetailReq:
+    properties:
+      postId:
+        type: integer
+    required:
+    - postId
+    type: object
+  post.ListReq:
+    properties:
+      page:
+        maximum: 200
+        minimum: 1
+        type: integer
+      pageSize:
+        maximum: 150
+        minimum: 5
+        type: integer
+      postType:
+        enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        type: integer
+      sort:
+        enum:
+        - 0
+        - 1
+        - 2
+        type: integer
+    required:
+    - page
+    - pageSize
+    - postType
+    - sort
     type: object
 host: localhost:9999
 info:
@@ -68,4 +140,60 @@ paths:
       responses: {}
       tags:
       - account
+  /post/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 创建请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/post.CreateReq'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      tags:
+      - post
+  /post/detail:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 详情请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/post.DetailReq'
+      produces:
+      - application/json
+      responses: {}
+      tags:
+      - post
+  /post/list:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 列表请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/post.ListReq'
+      produces:
+      - application/json
+      responses: {}
+      tags:
+      - post
+securityDefinitions:
+  BearerAuth:
+    description: 请输入 Bearer access_token
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

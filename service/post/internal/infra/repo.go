@@ -15,15 +15,20 @@ import (
 func List(db *gorm.DB, ctx context.Context, req *pb.PostListReq) ([]*model.Post, int64, error) {
 	pDal := dal.Use(db).Post
 
-	query := pDal.WithContext(ctx).
-		Where(pDal.PostType.Eq(int16(req.PostType)))
+	query := pDal.WithContext(ctx)
+	if req.PostType != 0 {
+		query = query.Where(pDal.PostType.Eq(int16(req.PostType)))
+	}
 
 	count, err := query.Count()
 	if err != nil {
 		return nil, 0, err
 	}
 
-	data, err := query.Offset(int(req.Page)).Limit(int(req.PageSize)).Order(getOrderExpr(db, req.Sort)).Find()
+	data, err := query.Offset(int((req.Page - 1) * req.PageSize)).
+		Limit(int(req.PageSize)).
+		Order(getOrderExpr(db, req.Sort)).
+		Find()
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, 0, err
 	}
@@ -58,6 +63,9 @@ func Detail(db *gorm.DB, ctx context.Context, req *pb.PostDetailReq) (*model.Pos
 	data, err := pDal.WithContext(ctx).Where(pDal.ID.Eq(req.PostId)).First()
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
+	}
+	if data == nil {
+		return &model.Post{}, nil
 	}
 	return data, nil
 }

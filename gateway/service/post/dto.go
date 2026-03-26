@@ -29,7 +29,6 @@ type (
 	}
 
 	CreateReq struct {
-		Uid      int64  `json:"uid" binding:"required,gt=0"`
 		Title    string `json:"title" binding:"required,min=1,max=100"`
 		Content  string `json:"content" binding:"required,min=1,max=1000"`
 		PostType int32  `json:"post_type" binding:"required,oneof=0 1 2 3"`

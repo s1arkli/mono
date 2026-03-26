@@ -13,7 +13,7 @@ var (
 )
 
 func Postgres() {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", viper.GetString("host"),
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", viper.GetString("pgsql.host"),
 		viper.GetString("pgsql.user"), viper.GetString("pgsql.pwd"), viper.GetString("db"), viper.GetString("pgsql.port"))
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {

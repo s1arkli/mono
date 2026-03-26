@@ -1,12 +1,15 @@
 pgsql:
-  host:
-  user: "admin"
-  pwd: "123456"
-  port: "5432"
+  host: pgsql
+  user: admin
+  pwd: 123456
+  port: 5432
 service:
   auth:
+    grpc: auth
     port: 9900
   post:
+    grpc: post
     port: 9910
   user:
+    grpc: user
     port: 9920

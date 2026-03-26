@@ -16,6 +16,9 @@ RUN CGO_ENABLED=0 go build -o app ./${SERVICE}
 
 FROM alpine:3.20
 
+RUN apk add --no-cache tzdata
+
 WORKDIR /app
 
 COPY --from=builder /app/app .
+COPY --from=builder /app/config ./config

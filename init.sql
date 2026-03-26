@@ -1,0 +1,2 @@
+CREATE DATABASE post;
+CREATE DATABASE "user";

@@ -3,8 +3,8 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"mono/gateway/initial"
 	"mono/pkg/dal"
+	"mono/pkg/initial"
 	"mono/service/user/pkg"
 )
 
