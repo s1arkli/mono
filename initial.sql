@@ -87,3 +87,20 @@ CREATE TABLE IF NOT EXISTS "user" (
     deleted_at TIMESTAMPTZ
 );
 CREATE INDEX IF NOT EXISTS idx_uid ON "user"(uid);
+
+\c node
+CREATE TABLE IF NOT EXISTS node (
+    id BIGSERIAL PRIMARY KEY ,
+    uid BIGINT NOT NULL ,
+    type int NOT NULL DEFAULT 2,-- 1= folder 2= note
+    parent_id BIGINT REFERENCES node(id), -- 代表此字段的值只能是file表里的id的某个值。也对应上了语义。
+    title varchar(64) NOT NULL ,
+    content TEXT NOT NULL DEFAULT '',
+    path varchar(1000) NOT NULL ,-- 使用id做路径，保证唯一性
+    sort int NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    deleted_at TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS idx_user_node ON node(uid,parent_id);
+CREATE INDEX idx_node_uid_path ON node(uid, path varchar_pattern_ops) WHERE deleted_at IS NULL;
