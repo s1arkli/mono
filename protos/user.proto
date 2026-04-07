@@ -6,6 +6,13 @@ package mono.user;
 
 option go_package = "mono/pb/user";
 
+service User {
+  rpc GetUserInfo(GetUserReq) returns (GetUserResp);
+  rpc BatchGetUserInfo(BatchGetUserReq) returns (BatchGetUserResp);
+  rpc UpdateUser(UpdateUserReq) returns (google.protobuf.Empty);
+  rpc CreateUser(CreateUserReq) returns (google.protobuf.Empty);
+}
+
 message GetUserReq {
   int64 uid = 1;
 }
@@ -38,9 +45,3 @@ message CreateUserReq {
   string avatar = 11;
 }
 
-service User {
-  rpc GetUserInfo(GetUserReq) returns (GetUserResp);
-  rpc BatchGetUserInfo(BatchGetUserReq) returns (BatchGetUserResp);
-  rpc UpdateUser(UpdateUserReq) returns (google.protobuf.Empty);
-  rpc CreateUser(CreateUserReq) returns (google.protobuf.Empty);
-}

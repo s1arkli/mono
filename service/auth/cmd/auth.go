@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 
-	authpb "mono/pb"
+	"mono/pb/auth"
 	"mono/pkg/initial"
 	"mono/service/auth/internal/client"
 	"mono/service/auth/internal/interfaces"
@@ -42,7 +42,7 @@ var authCmd = &cobra.Command{
 		s := grpc.NewServer()
 
 		// 这一步是必须的：把你的实现注册到 gRPC Server
-		authpb.RegisterAuthServiceServer(s, &interfaces.Auth{
+		auth.RegisterAuthServiceServer(s, &interfaces.Auth{
 			DB:   db,
 			User: user,
 		})

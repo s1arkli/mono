@@ -51,3 +51,33 @@ func ParseToken(tokenStr string) (*Claims, error) {
 	}
 	return nil, fmt.Errorf("invalid token")
 }
+
+// 语音平台
+
+type LiveKitClaims struct {
+	Video *VideoGrant `json:"video"`
+	jwt.RegisteredClaims
+}
+
+type VideoGrant struct {
+	RoomJoin bool   `json:"roomJoin"`
+	Room     string `json:"room"`
+}
+
+func GenerateLiveKitToken(apiKey, apiSecret, room, identity string) (string, error) {
+	claims := LiveKitClaims{
+		Video: &VideoGrant{
+			RoomJoin: true,
+			Room:     room,
+		},
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    apiKey,
+			Subject:   identity,
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(6 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(apiSecret))
+}

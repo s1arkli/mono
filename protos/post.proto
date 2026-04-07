@@ -6,6 +6,15 @@ package mono.post;
 
 option go_package = "mono/pb/post";
 
+service Post{
+  rpc List(PostListReq) returns (PostListResp);
+  rpc Create(PostCreateReq) returns (google.protobuf.Empty);
+  rpc Detail(PostDetailReq) returns (PostDetailResp);
+  rpc GetPostComment(PostCommentReq) returns (PostCommentResp);
+  rpc SetComment(SetCommentReq) returns (google.protobuf.Empty);
+  rpc SetLikeComment(SetLikeReq) returns (google.protobuf.Empty);
+}
+
 message PostListReq {
   int32 page = 1;
   int32 page_size = 2;
@@ -118,11 +127,3 @@ message SetLikeReq {
   int64 uid = 10;
 }
 
-service Post{
-  rpc List(PostListReq) returns (PostListResp);
-  rpc Create(PostCreateReq) returns (google.protobuf.Empty);
-  rpc Detail(PostDetailReq) returns (PostDetailResp);
-  rpc GetPostComment(PostCommentReq) returns (PostCommentResp);
-  rpc SetComment(SetCommentReq) returns (google.protobuf.Empty);
-  rpc SetLikeComment(SetLikeReq) returns (google.protobuf.Empty);
-}

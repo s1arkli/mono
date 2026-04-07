@@ -21,8 +21,9 @@ import {
 import { Toast, type ToastState } from './components/Toast'
 import { appLogger, useBrowserLogBridge } from './lib/logger'
 import { ProfilePage } from './features/user'
+import { VoicePage } from './pages/VoicePage'
 
-type PageMode = 'forum-guest' | 'forum-member' | 'auth' | 'compose' | 'detail' | 'profile'
+type PageMode = 'forum-guest' | 'forum-member' | 'voice' | 'auth' | 'compose' | 'detail' | 'profile'
 
 /**
  * @description 管理前端单页应用的主流程状态，并把各业务页面串成完整体验。
@@ -81,6 +82,10 @@ export default function App() {
     setPageMode('forum-member')
   }
 
+  function handleOpenForumPage() {
+    setPageMode(auth.accessToken ? 'forum-member' : 'forum-guest')
+  }
+
   /**
    * @description 记录详情页来源帖子和返回目标，保证从不同入口进入时都能正确回跳。
    * @param post PostFeedItem（帖子卡片视图数据），当前点击的帖子摘要。
@@ -104,6 +109,7 @@ export default function App() {
           onOpenAuth={() => setPageMode('auth')}
           onOpenComposer={() => setPageMode('compose')}
           onOpenDetail={(post) => handleOpenDetailPage(post, 'forum-guest')}
+          onOpenVoice={() => setPageMode('voice')}
           onOpenProfile={() => setPageMode('profile')}
           onToast={setToast}
           feedPageSize={feedPageSize}
@@ -130,6 +136,7 @@ export default function App() {
           onOpenAuth={() => setPageMode('auth')}
           onOpenComposer={() => setPageMode('compose')}
           onOpenDetail={(post) => handleOpenDetailPage(post, 'forum-member')}
+          onOpenVoice={() => setPageMode('voice')}
           onOpenProfile={() => setPageMode('profile')}
           onToast={setToast}
           feedPageSize={feedPageSize}
@@ -141,6 +148,15 @@ export default function App() {
           topicLabels={topicLabels}
           topicOptions={topicOptions}
         />
+      </>
+    )
+  }
+
+  if (pageMode === 'voice') {
+    return (
+      <>
+        <Toast toast={toast} />
+        <VoicePage onOpenPosts={handleOpenForumPage} onToast={setToast} />
       </>
     )
   }

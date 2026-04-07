@@ -4,7 +4,7 @@
 // 	protoc        v6.33.4
 // source: post.proto
 
-package pb
+package post
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -76,7 +76,7 @@ type PostListReq struct {
 	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	PostType      int32                  `protobuf:"varint,10,opt,name=post_type,json=postType,proto3" json:"post_type,omitempty"`
-	Sort          SortType               `protobuf:"varint,11,opt,name=sort,proto3,enum=rpc.proto.post.SortType" json:"sort,omitempty"`
+	Sort          SortType               `protobuf:"varint,11,opt,name=sort,proto3,enum=mono.post.SortType" json:"sort,omitempty"`
 	Uid           int64                  `protobuf:"varint,20,opt,name=uid,proto3" json:"uid,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1004,16 +1004,16 @@ var File_post_proto protoreflect.FileDescriptor
 const file_post_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"post.proto\x12\x0erpc.proto.post\x1a\x1bgoogle/protobuf/empty.proto\"\x9b\x01\n" +
+	"post.proto\x12\tmono.post\x1a\x1bgoogle/protobuf/empty.proto\"\x96\x01\n" +
 	"\vPostListReq\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
 	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\x12\x1b\n" +
 	"\tpost_type\x18\n" +
-	" \x01(\x05R\bpostType\x12,\n" +
-	"\x04sort\x18\v \x01(\x0e2\x18.rpc.proto.post.SortTypeR\x04sort\x12\x10\n" +
-	"\x03uid\x18\x14 \x01(\x03R\x03uid\"X\n" +
-	"\fPostListResp\x122\n" +
-	"\x05posts\x18\x01 \x03(\v2\x1c.rpc.proto.post.PostListItemR\x05posts\x12\x14\n" +
+	" \x01(\x05R\bpostType\x12'\n" +
+	"\x04sort\x18\v \x01(\x0e2\x13.mono.post.SortTypeR\x04sort\x12\x10\n" +
+	"\x03uid\x18\x14 \x01(\x03R\x03uid\"S\n" +
+	"\fPostListResp\x12-\n" +
+	"\x05posts\x18\x01 \x03(\v2\x17.mono.post.PostListItemR\x05posts\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x03R\x05total\"\xfc\x02\n" +
 	"\fPostListItem\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x18\n" +
@@ -1058,16 +1058,16 @@ const file_post_proto_rawDesc = "" +
 	"\apost_id\x18\x01 \x01(\x03R\x06postId\x12\x16\n" +
 	"\x06cursor\x18\x02 \x01(\x03R\x06cursor\x12\x1b\n" +
 	"\tpage_size\x18\x03 \x01(\x05R\bpageSize\x12\x10\n" +
-	"\x03uid\x18\x04 \x01(\x03R\x03uid\"r\n" +
-	"\x0fPostCommentResp\x12D\n" +
-	"\x0eparent_comment\x18\x01 \x03(\v2\x1d.rpc.proto.post.ParentCommentR\rparentComment\x12\x19\n" +
-	"\bhas_more\x18\x02 \x01(\bR\ahasMore\"\x81\x02\n" +
+	"\x03uid\x18\x04 \x01(\x03R\x03uid\"m\n" +
+	"\x0fPostCommentResp\x12?\n" +
+	"\x0eparent_comment\x18\x01 \x03(\v2\x18.mono.post.ParentCommentR\rparentComment\x12\x19\n" +
+	"\bhas_more\x18\x02 \x01(\bR\ahasMore\"\xfc\x01\n" +
 	"\rParentComment\x12\x1d\n" +
 	"\n" +
 	"comment_id\x18\x01 \x01(\x03R\tcommentId\x12\x10\n" +
 	"\x03uid\x18\x02 \x01(\x03R\x03uid\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\tR\acontent\x12J\n" +
-	"\x10children_comment\x18\x04 \x03(\v2\x1f.rpc.proto.post.ChildrenCommentR\x0fchildrenComment\x12\x1f\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\x12E\n" +
+	"\x10children_comment\x18\x04 \x03(\v2\x1a.mono.post.ChildrenCommentR\x0fchildrenComment\x12\x1f\n" +
 	"\vreply_count\x18\x05 \x01(\x03R\n" +
 	"replyCount\x12\x1d\n" +
 	"\n" +
@@ -1100,15 +1100,15 @@ const file_post_proto_rawDesc = "" +
 	"\bSortType\x12\x15\n" +
 	"\x11SORT_TYPE_DEFAULT\x10\x00\x12\x11\n" +
 	"\rSORT_TYPE_HOT\x10\x01\x12\x11\n" +
-	"\rSORT_TYPE_NEW\x10\x022\xb1\x03\n" +
-	"\x04Post\x12A\n" +
-	"\x04List\x12\x1b.rpc.proto.post.PostListReq\x1a\x1c.rpc.proto.post.PostListResp\x12?\n" +
-	"\x06Create\x12\x1d.rpc.proto.post.PostCreateReq\x1a\x16.google.protobuf.Empty\x12G\n" +
-	"\x06Detail\x12\x1d.rpc.proto.post.PostDetailReq\x1a\x1e.rpc.proto.post.PostDetailResp\x12Q\n" +
-	"\x0eGetPostComment\x12\x1e.rpc.proto.post.PostCommentReq\x1a\x1f.rpc.proto.post.PostCommentResp\x12C\n" +
+	"\rSORT_TYPE_NEW\x10\x022\x84\x03\n" +
+	"\x04Post\x127\n" +
+	"\x04List\x12\x16.mono.post.PostListReq\x1a\x17.mono.post.PostListResp\x12:\n" +
+	"\x06Create\x12\x18.mono.post.PostCreateReq\x1a\x16.google.protobuf.Empty\x12=\n" +
+	"\x06Detail\x12\x18.mono.post.PostDetailReq\x1a\x19.mono.post.PostDetailResp\x12G\n" +
+	"\x0eGetPostComment\x12\x19.mono.post.PostCommentReq\x1a\x1a.mono.post.PostCommentResp\x12>\n" +
 	"\n" +
-	"SetComment\x12\x1d.rpc.proto.post.SetCommentReq\x1a\x16.google.protobuf.Empty\x12D\n" +
-	"\x0eSetLikeComment\x12\x1a.rpc.proto.post.SetLikeReq\x1a\x16.google.protobuf.EmptyB\tZ\amono/pbb\x06proto3"
+	"SetComment\x12\x18.mono.post.SetCommentReq\x1a\x16.google.protobuf.Empty\x12?\n" +
+	"\x0eSetLikeComment\x12\x15.mono.post.SetLikeReq\x1a\x16.google.protobuf.EmptyB\x0eZ\fmono/pb/postb\x06proto3"
 
 var (
 	file_post_proto_rawDescOnce sync.Once
@@ -1125,38 +1125,38 @@ func file_post_proto_rawDescGZIP() []byte {
 var file_post_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_post_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_post_proto_goTypes = []any{
-	(SortType)(0),           // 0: rpc.proto.post.SortType
-	(*PostListReq)(nil),     // 1: rpc.proto.post.PostListReq
-	(*PostListResp)(nil),    // 2: rpc.proto.post.PostListResp
-	(*PostListItem)(nil),    // 3: rpc.proto.post.PostListItem
-	(*PostCreateReq)(nil),   // 4: rpc.proto.post.PostCreateReq
-	(*PostDetailReq)(nil),   // 5: rpc.proto.post.PostDetailReq
-	(*PostDetailResp)(nil),  // 6: rpc.proto.post.PostDetailResp
-	(*PostCommentReq)(nil),  // 7: rpc.proto.post.PostCommentReq
-	(*PostCommentResp)(nil), // 8: rpc.proto.post.PostCommentResp
-	(*ParentComment)(nil),   // 9: rpc.proto.post.ParentComment
-	(*ChildrenComment)(nil), // 10: rpc.proto.post.ChildrenComment
-	(*SetCommentReq)(nil),   // 11: rpc.proto.post.SetCommentReq
-	(*SetLikeReq)(nil),      // 12: rpc.proto.post.SetLikeReq
+	(SortType)(0),           // 0: mono.post.SortType
+	(*PostListReq)(nil),     // 1: mono.post.PostListReq
+	(*PostListResp)(nil),    // 2: mono.post.PostListResp
+	(*PostListItem)(nil),    // 3: mono.post.PostListItem
+	(*PostCreateReq)(nil),   // 4: mono.post.PostCreateReq
+	(*PostDetailReq)(nil),   // 5: mono.post.PostDetailReq
+	(*PostDetailResp)(nil),  // 6: mono.post.PostDetailResp
+	(*PostCommentReq)(nil),  // 7: mono.post.PostCommentReq
+	(*PostCommentResp)(nil), // 8: mono.post.PostCommentResp
+	(*ParentComment)(nil),   // 9: mono.post.ParentComment
+	(*ChildrenComment)(nil), // 10: mono.post.ChildrenComment
+	(*SetCommentReq)(nil),   // 11: mono.post.SetCommentReq
+	(*SetLikeReq)(nil),      // 12: mono.post.SetLikeReq
 	(*emptypb.Empty)(nil),   // 13: google.protobuf.Empty
 }
 var file_post_proto_depIdxs = []int32{
-	0,  // 0: rpc.proto.post.PostListReq.sort:type_name -> rpc.proto.post.SortType
-	3,  // 1: rpc.proto.post.PostListResp.posts:type_name -> rpc.proto.post.PostListItem
-	9,  // 2: rpc.proto.post.PostCommentResp.parent_comment:type_name -> rpc.proto.post.ParentComment
-	10, // 3: rpc.proto.post.ParentComment.children_comment:type_name -> rpc.proto.post.ChildrenComment
-	1,  // 4: rpc.proto.post.Post.List:input_type -> rpc.proto.post.PostListReq
-	4,  // 5: rpc.proto.post.Post.Create:input_type -> rpc.proto.post.PostCreateReq
-	5,  // 6: rpc.proto.post.Post.Detail:input_type -> rpc.proto.post.PostDetailReq
-	7,  // 7: rpc.proto.post.Post.GetPostComment:input_type -> rpc.proto.post.PostCommentReq
-	11, // 8: rpc.proto.post.Post.SetComment:input_type -> rpc.proto.post.SetCommentReq
-	12, // 9: rpc.proto.post.Post.SetLikeComment:input_type -> rpc.proto.post.SetLikeReq
-	2,  // 10: rpc.proto.post.Post.List:output_type -> rpc.proto.post.PostListResp
-	13, // 11: rpc.proto.post.Post.Create:output_type -> google.protobuf.Empty
-	6,  // 12: rpc.proto.post.Post.Detail:output_type -> rpc.proto.post.PostDetailResp
-	8,  // 13: rpc.proto.post.Post.GetPostComment:output_type -> rpc.proto.post.PostCommentResp
-	13, // 14: rpc.proto.post.Post.SetComment:output_type -> google.protobuf.Empty
-	13, // 15: rpc.proto.post.Post.SetLikeComment:output_type -> google.protobuf.Empty
+	0,  // 0: mono.post.PostListReq.sort:type_name -> mono.post.SortType
+	3,  // 1: mono.post.PostListResp.posts:type_name -> mono.post.PostListItem
+	9,  // 2: mono.post.PostCommentResp.parent_comment:type_name -> mono.post.ParentComment
+	10, // 3: mono.post.ParentComment.children_comment:type_name -> mono.post.ChildrenComment
+	1,  // 4: mono.post.Post.List:input_type -> mono.post.PostListReq
+	4,  // 5: mono.post.Post.Create:input_type -> mono.post.PostCreateReq
+	5,  // 6: mono.post.Post.Detail:input_type -> mono.post.PostDetailReq
+	7,  // 7: mono.post.Post.GetPostComment:input_type -> mono.post.PostCommentReq
+	11, // 8: mono.post.Post.SetComment:input_type -> mono.post.SetCommentReq
+	12, // 9: mono.post.Post.SetLikeComment:input_type -> mono.post.SetLikeReq
+	2,  // 10: mono.post.Post.List:output_type -> mono.post.PostListResp
+	13, // 11: mono.post.Post.Create:output_type -> google.protobuf.Empty
+	6,  // 12: mono.post.Post.Detail:output_type -> mono.post.PostDetailResp
+	8,  // 13: mono.post.Post.GetPostComment:output_type -> mono.post.PostCommentResp
+	13, // 14: mono.post.Post.SetComment:output_type -> google.protobuf.Empty
+	13, // 15: mono.post.Post.SetLikeComment:output_type -> google.protobuf.Empty
 	10, // [10:16] is the sub-list for method output_type
 	4,  // [4:10] is the sub-list for method input_type
 	4,  // [4:4] is the sub-list for extension type_name

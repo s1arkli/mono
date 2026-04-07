@@ -1,12 +1,13 @@
 package interfaces
 
 import (
-	"mono/pb"
+	"mono/pb/post"
+	"mono/pb/user"
 	"mono/service/post/internal/infra/model"
 )
 
-func postModelsToPB(data []*model.Post, total int64) (*pb.PostListResp, []int64) {
-	res := new(pb.PostListResp)
+func postModelsToPB(data []*model.Post, total int64) (*post.PostListResp, []int64) {
+	res := new(post.PostListResp)
 	uids := make([]int64, 0)
 	if len(data) == 0 {
 		return res, uids
@@ -14,7 +15,7 @@ func postModelsToPB(data []*model.Post, total int64) (*pb.PostListResp, []int64)
 	res.Total = total
 	for _, v := range data {
 		uids = append(uids, v.UID)
-		res.Posts = append(res.Posts, &pb.PostListItem{
+		res.Posts = append(res.Posts, &post.PostListItem{
 			Title:        v.Title,
 			Summary:      getSummary(v.Content, 20),
 			PostId:       v.ID,
@@ -40,7 +41,7 @@ func getSummary(content string, n int) string {
 	return string(r[:n]) + "..."
 }
 
-func appendUserInfo(data *pb.PostListResp, userMap map[int64]*pb.GetUserResp) *pb.PostListResp {
+func appendUserInfo(data *post.PostListResp, userMap map[int64]*user.GetUserResp) *post.PostListResp {
 	if data == nil {
 		return data
 	}

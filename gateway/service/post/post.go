@@ -7,17 +7,17 @@ import (
 	"mono/gateway/ecode"
 	"mono/gateway/response"
 	"mono/gateway/service"
-	"mono/pb"
+	"mono/pb/post"
 )
 
 type Service struct {
-	post pb.PostClient
+	post post.PostClient
 	conn *grpc.ClientConn
 }
 
 func NewService(conn *grpc.ClientConn) *Service {
 	return &Service{
-		post: pb.NewPostClient(conn),
+		post: post.NewPostClient(conn),
 		conn: conn,
 	}
 }
@@ -37,11 +37,16 @@ func (s *Service) List(c *gin.Context) {
 		return
 	}
 
-	resp, err := s.post.List(c, &pb.PostListReq{
+	if _, ok := post.SortType_name[req.Sort]; !ok {
+		response.Fail(c, ecode.ParamErr)
+		return
+	}
+
+	resp, err := s.post.List(c, &post.PostListReq{
 		Page:     req.Page,
 		PageSize: req.PageSize,
 		PostType: req.PostType,
-		Sort:     pb.SortType(req.Sort),
+		Sort:     post.SortType(req.Sort),
 		Uid:      service.GetUserID(c),
 	})
 	if err != nil {
@@ -68,7 +73,7 @@ func (s *Service) Create(c *gin.Context) {
 		return
 	}
 
-	resp, err := s.post.Create(c, &pb.PostCreateReq{
+	resp, err := s.post.Create(c, &post.PostCreateReq{
 		Uid:      service.GetUserID(c),
 		Title:    req.Title,
 		Content:  req.Content,
@@ -97,7 +102,7 @@ func (s *Service) Detail(c *gin.Context) {
 		return
 	}
 
-	resp, err := s.post.Detail(c, &pb.PostDetailReq{
+	resp, err := s.post.Detail(c, &post.PostDetailReq{
 		PostId: req.PostId,
 		Uid:    service.GetUserID(c),
 	})
@@ -124,7 +129,7 @@ func (s *Service) Comment(c *gin.Context) {
 		return
 	}
 
-	resp, err := s.post.GetPostComment(c, &pb.PostCommentReq{
+	resp, err := s.post.GetPostComment(c, &post.PostCommentReq{
 		PostId:   req.PostId,
 		Cursor:   req.Cursor,
 		PageSize: req.PageSize,
@@ -154,7 +159,7 @@ func (s *Service) SetComment(c *gin.Context) {
 		return
 	}
 
-	resp, err := s.post.SetComment(c, &pb.SetCommentReq{
+	resp, err := s.post.SetComment(c, &post.SetCommentReq{
 		PostId:   req.PostId,
 		Uid:      service.GetUserID(c),
 		Content:  req.Content,
@@ -185,7 +190,7 @@ func (s *Service) Like(c *gin.Context) {
 		return
 	}
 
-	resp, err := s.post.SetLikeComment(c, &pb.SetLikeReq{
+	resp, err := s.post.SetLikeComment(c, &post.SetLikeReq{
 		TargetId:   req.TargetId,
 		TargetType: req.TargetType,
 		Uid:        service.GetUserID(c),

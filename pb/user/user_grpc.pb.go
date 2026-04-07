@@ -4,7 +4,7 @@
 // - protoc             v6.33.4
 // source: user.proto
 
-package pb
+package user
 
 import (
 	context "context"
@@ -20,10 +20,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	User_GetUserInfo_FullMethodName      = "/rpc.proto.user.User/GetUserInfo"
-	User_BatchGetUserInfo_FullMethodName = "/rpc.proto.user.User/BatchGetUserInfo"
-	User_UpdateUser_FullMethodName       = "/rpc.proto.user.User/UpdateUser"
-	User_CreateUser_FullMethodName       = "/rpc.proto.user.User/CreateUser"
+	User_GetUserInfo_FullMethodName      = "/mono.user.User/GetUserInfo"
+	User_BatchGetUserInfo_FullMethodName = "/mono.user.User/BatchGetUserInfo"
+	User_UpdateUser_FullMethodName       = "/mono.user.User/UpdateUser"
+	User_CreateUser_FullMethodName       = "/mono.user.User/CreateUser"
 )
 
 // UserClient is the client API for User service.
@@ -211,7 +211,7 @@ func _User_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(int
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var User_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "rpc.proto.user.User",
+	ServiceName: "mono.user.User",
 	HandlerType: (*UserServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

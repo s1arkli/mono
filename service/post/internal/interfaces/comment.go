@@ -7,12 +7,12 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"mono/pb"
+	"mono/pb/post"
 	"mono/service/post/internal/infra/model"
 )
 
-func (p *Post) GetPostComment(ctx context.Context, req *pb.PostCommentReq) (*pb.PostCommentResp, error) {
-	res := new(pb.PostCommentResp)
+func (p *Post) GetPostComment(ctx context.Context, req *post.PostCommentReq) (*post.PostCommentResp, error) {
+	res := new(post.PostCommentResp)
 
 	hotCmt := make([]*model.Comment, 0)
 	hotIds := make([]int64, 0)
@@ -64,8 +64,8 @@ func (p *Post) GetPostComment(ctx context.Context, req *pb.PostCommentReq) (*pb.
 	}
 	likedMap := p.like.BatchIsLiked(ctx, req.Uid, allCommentIDs, 2)
 
-	toParentPB := func(c *model.Comment) *pb.ParentComment {
-		pc := &pb.ParentComment{
+	toParentPB := func(c *model.Comment) *post.ParentComment {
+		pc := &post.ParentComment{
 			CommentId:  c.ID,
 			Uid:        c.UID,
 			Content:    c.Content,
@@ -74,7 +74,7 @@ func (p *Post) GetPostComment(ctx context.Context, req *pb.PostCommentReq) (*pb.
 			IsLiked:    likedMap[c.ID],
 		}
 		for _, child := range childMap[c.ID] {
-			pc.ChildrenComment = append(pc.ChildrenComment, &pb.ChildrenComment{
+			pc.ChildrenComment = append(pc.ChildrenComment, &post.ChildrenComment{
 				CommentId: child.ID,
 				Uid:       child.UID,
 				ReplyUid:  child.ReplyUID,
@@ -95,7 +95,7 @@ func (p *Post) GetPostComment(ctx context.Context, req *pb.PostCommentReq) (*pb.
 	return res, nil
 }
 
-func (p *Post) SetComment(ctx context.Context, req *pb.SetCommentReq) (*emptypb.Empty, error) {
+func (p *Post) SetComment(ctx context.Context, req *post.SetCommentReq) (*emptypb.Empty, error) {
 	err := p.comment.CreateComment(ctx, req.PostId, req.Uid, req.Content, req.ParentId, req.ReplyUid)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -103,7 +103,7 @@ func (p *Post) SetComment(ctx context.Context, req *pb.SetCommentReq) (*emptypb.
 	return &emptypb.Empty{}, nil
 }
 
-func (p *Post) SetLikeComment(ctx context.Context, req *pb.SetLikeReq) (*emptypb.Empty, error) {
+func (p *Post) SetLikeComment(ctx context.Context, req *post.SetLikeReq) (*emptypb.Empty, error) {
 	_, err := p.like.ToggleLike(ctx, req.Uid, req.TargetId, int16(req.TargetType))
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())

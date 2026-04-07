@@ -4,7 +4,7 @@
 // 	protoc        v6.33.4
 // source: auth.proto
 
-package pb
+package auth
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -319,7 +319,7 @@ var File_auth_proto protoreflect.FileDescriptor
 const file_auth_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"auth.proto\x12\x0fgrpc.proto.auth\x1a\x1bgoogle/protobuf/empty.proto\"w\n" +
+	"auth.proto\x12\tmono.auth\x1a\x1bgoogle/protobuf/empty.proto\"w\n" +
 	"\vRegisterReq\x12\x18\n" +
 	"\aaccount\x18\x01 \x01(\tR\aaccount\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x1a\n" +
@@ -341,11 +341,11 @@ const file_auth_proto_rawDesc = "" +
 	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"U\n" +
 	"\vRefreshResp\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12#\n" +
-	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken2\xd5\x01\n" +
-	"\vAuthService\x12@\n" +
-	"\bRegister\x12\x1c.grpc.proto.auth.RegisterReq\x1a\x16.google.protobuf.Empty\x12>\n" +
-	"\x05Login\x12\x19.grpc.proto.auth.LoginReq\x1a\x1a.grpc.proto.auth.LoginResp\x12D\n" +
-	"\aRefresh\x12\x1b.grpc.proto.auth.RefreshReq\x1a\x1c.grpc.proto.auth.RefreshRespB\tZ\amono/pbb\x06proto3"
+	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken2\xb7\x01\n" +
+	"\vAuthService\x12:\n" +
+	"\bRegister\x12\x16.mono.auth.RegisterReq\x1a\x16.google.protobuf.Empty\x122\n" +
+	"\x05Login\x12\x13.mono.auth.LoginReq\x1a\x14.mono.auth.LoginResp\x128\n" +
+	"\aRefresh\x12\x15.mono.auth.RefreshReq\x1a\x16.mono.auth.RefreshRespB\x0eZ\fmono/pb/authb\x06proto3"
 
 var (
 	file_auth_proto_rawDescOnce sync.Once
@@ -361,20 +361,20 @@ func file_auth_proto_rawDescGZIP() []byte {
 
 var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_auth_proto_goTypes = []any{
-	(*RegisterReq)(nil),   // 0: grpc.proto.auth.RegisterReq
-	(*LoginReq)(nil),      // 1: grpc.proto.auth.LoginReq
-	(*LoginResp)(nil),     // 2: grpc.proto.auth.LoginResp
-	(*RefreshReq)(nil),    // 3: grpc.proto.auth.RefreshReq
-	(*RefreshResp)(nil),   // 4: grpc.proto.auth.RefreshResp
+	(*RegisterReq)(nil),   // 0: mono.auth.RegisterReq
+	(*LoginReq)(nil),      // 1: mono.auth.LoginReq
+	(*LoginResp)(nil),     // 2: mono.auth.LoginResp
+	(*RefreshReq)(nil),    // 3: mono.auth.RefreshReq
+	(*RefreshResp)(nil),   // 4: mono.auth.RefreshResp
 	(*emptypb.Empty)(nil), // 5: google.protobuf.Empty
 }
 var file_auth_proto_depIdxs = []int32{
-	0, // 0: grpc.proto.auth.AuthService.Register:input_type -> grpc.proto.auth.RegisterReq
-	1, // 1: grpc.proto.auth.AuthService.Login:input_type -> grpc.proto.auth.LoginReq
-	3, // 2: grpc.proto.auth.AuthService.Refresh:input_type -> grpc.proto.auth.RefreshReq
-	5, // 3: grpc.proto.auth.AuthService.Register:output_type -> google.protobuf.Empty
-	2, // 4: grpc.proto.auth.AuthService.Login:output_type -> grpc.proto.auth.LoginResp
-	4, // 5: grpc.proto.auth.AuthService.Refresh:output_type -> grpc.proto.auth.RefreshResp
+	0, // 0: mono.auth.AuthService.Register:input_type -> mono.auth.RegisterReq
+	1, // 1: mono.auth.AuthService.Login:input_type -> mono.auth.LoginReq
+	3, // 2: mono.auth.AuthService.Refresh:input_type -> mono.auth.RefreshReq
+	5, // 3: mono.auth.AuthService.Register:output_type -> google.protobuf.Empty
+	2, // 4: mono.auth.AuthService.Login:output_type -> mono.auth.LoginResp
+	4, // 5: mono.auth.AuthService.Refresh:output_type -> mono.auth.RefreshResp
 	3, // [3:6] is the sub-list for method output_type
 	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

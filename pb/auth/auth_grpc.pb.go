@@ -4,7 +4,7 @@
 // - protoc             v6.33.4
 // source: auth.proto
 
-package pb
+package auth
 
 import (
 	context "context"
@@ -20,9 +20,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_Register_FullMethodName = "/grpc.proto.auth.AuthService/Register"
-	AuthService_Login_FullMethodName    = "/grpc.proto.auth.AuthService/Login"
-	AuthService_Refresh_FullMethodName  = "/grpc.proto.auth.AuthService/Refresh"
+	AuthService_Register_FullMethodName = "/mono.auth.AuthService/Register"
+	AuthService_Login_FullMethodName    = "/mono.auth.AuthService/Login"
+	AuthService_Refresh_FullMethodName  = "/mono.auth.AuthService/Refresh"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -177,7 +177,7 @@ func _AuthService_Refresh_Handler(srv interface{}, ctx context.Context, dec func
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var AuthService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "grpc.proto.auth.AuthService",
+	ServiceName: "mono.auth.AuthService",
 	HandlerType: (*AuthServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

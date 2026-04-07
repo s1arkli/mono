@@ -4,20 +4,20 @@ import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 
-	authpb "mono/pb"
+	"mono/pb/auth"
 
 	"mono/gateway/ecode"
 	"mono/gateway/response"
 )
 
 type Service struct {
-	auth authpb.AuthServiceClient
+	auth auth.AuthServiceClient
 	conn *grpc.ClientConn
 }
 
 func NewService(conn *grpc.ClientConn) *Service {
 	return &Service{
-		auth: authpb.NewAuthServiceClient(conn),
+		auth: auth.NewAuthServiceClient(conn),
 		conn: conn,
 	}
 }
@@ -38,7 +38,7 @@ func (s *Service) Register(c *gin.Context) {
 		return
 	}
 
-	_, err := s.auth.Register(c, &authpb.RegisterReq{
+	_, err := s.auth.Register(c, &auth.RegisterReq{
 		Account:  req.Account,
 		Password: req.Password,
 	})
@@ -66,7 +66,7 @@ func (s *Service) Login(c *gin.Context) {
 		return
 	}
 
-	resp, err := s.auth.Login(c, &authpb.LoginReq{
+	resp, err := s.auth.Login(c, &auth.LoginReq{
 		Account:  req.Account,
 		Password: req.Password,
 	})
@@ -100,7 +100,7 @@ func (s *Service) Refresh(c *gin.Context) {
 		return
 	}
 
-	resp, err := s.auth.Refresh(c, &authpb.RefreshReq{
+	resp, err := s.auth.Refresh(c, &auth.RefreshReq{
 		RefreshToken: rToken,
 	})
 	if err != nil {

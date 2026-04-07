@@ -1,13 +1,16 @@
 syntax = "proto3";
 
-import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
 package mono.node;
 
 option go_package = "mono/pb/node";
 
-//获取某个节点下的文件，parent_id=null即为根节点
+service Node{
+  rpc ListNode(ListNodeReq) returns (ListNodeResp);
+}
+
+// ListNode 获取某个节点下的文件，parent_id=null即为根节点
 message ListNodeReq {
   int64 uid = 1;
   optional int64 parent_id = 2;
@@ -17,14 +20,20 @@ message ListNodeResp {
   repeated NodeItem list = 1;
 }
 
+enum NodeType {
+    NODE_TYPE_UNSPECIFIED = 0;
+    NODE_TYPE_FOLDER = 1;
+    NODE_TYPE_NOTE = 2;
+}
+
 message NodeItem {
   int64 id = 1;
   int64 uid = 2;
-  int32 type = 3; // 1= folder 2= note
+  NodeType type = 3; // 1= folder 2= note
   optional int64 parent_id = 4;
   string title = 5;
-  string content = 6;
-  string path = 7;
-  google.protobuf.Timestamp created_at = 8;
-  google.protobuf.Timestamp updated_at = 9;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
 }
+
+//

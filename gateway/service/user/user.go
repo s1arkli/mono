@@ -6,17 +6,17 @@ import (
 
 	"mono/gateway/ecode"
 	"mono/gateway/response"
-	"mono/pb"
+	"mono/pb/user"
 )
 
 type Service struct {
-	user pb.UserClient
+	user user.UserClient
 	conn *grpc.ClientConn
 }
 
 func NewService(conn *grpc.ClientConn) *Service {
 	return &Service{
-		user: pb.NewUserClient(conn),
+		user: user.NewUserClient(conn),
 		conn: conn,
 	}
 }
@@ -36,7 +36,7 @@ func (s *Service) BatchGetUsersInfo(c *gin.Context) {
 		return
 	}
 
-	userMap, err := s.user.BatchGetUserInfo(c, &pb.BatchGetUserReq{
+	userMap, err := s.user.BatchGetUserInfo(c, &user.BatchGetUserReq{
 		Uids: req.Uids,
 	})
 	if err != nil {
@@ -62,7 +62,7 @@ func (s *Service) Update(c *gin.Context) {
 		return
 	}
 
-	if _, err := s.user.UpdateUser(c, &pb.UpdateUserReq{
+	if _, err := s.user.UpdateUser(c, &user.UpdateUserReq{
 		Uid:      req.Uid,
 		Nickname: req.Nickname,
 		Avatar:   req.Avatar,

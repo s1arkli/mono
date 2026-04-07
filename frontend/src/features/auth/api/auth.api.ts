@@ -8,7 +8,7 @@ import type { LoginData, LoginPayload, RegisterPayload } from '@/features/auth/t
  * @returns Promise<LoginData>，登录成功后的访问令牌和用户信息。
  */
 export function login(payload: LoginPayload) {
-  return postJson<LoginData, LoginPayload>('/login', payload)
+  return postJson<LoginData, LoginPayload>('/auth', payload)
 }
 
 /**

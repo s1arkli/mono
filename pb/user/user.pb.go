@@ -4,7 +4,7 @@
 // 	protoc        v6.33.4
 // source: user.proto
 
-package pb
+package user
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -339,7 +339,7 @@ var File_user_proto protoreflect.FileDescriptor
 const file_user_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"user.proto\x12\x0erpc.proto.user\x1a\x1bgoogle/protobuf/empty.proto\"\x1e\n" +
+	"user.proto\x12\tmono.user\x1a\x1bgoogle/protobuf/empty.proto\"\x1e\n" +
 	"\n" +
 	"GetUserReq\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\x03R\x03uid\"S\n" +
@@ -348,13 +348,13 @@ const file_user_proto_rawDesc = "" +
 	"\bnickname\x18\x02 \x01(\tR\bnickname\x12\x16\n" +
 	"\x06avatar\x18\x03 \x01(\tR\x06avatar\"%\n" +
 	"\x0fBatchGetUserReq\x12\x12\n" +
-	"\x04uids\x18\x01 \x03(\x03R\x04uids\"\xac\x01\n" +
-	"\x10BatchGetUserResp\x12A\n" +
-	"\x05users\x18\x01 \x03(\v2+.rpc.proto.user.BatchGetUserResp.UsersEntryR\x05users\x1aU\n" +
+	"\x04uids\x18\x01 \x03(\x03R\x04uids\"\xa2\x01\n" +
+	"\x10BatchGetUserResp\x12<\n" +
+	"\x05users\x18\x01 \x03(\v2&.mono.user.BatchGetUserResp.UsersEntryR\x05users\x1aP\n" +
 	"\n" +
 	"UsersEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\x03R\x03key\x121\n" +
-	"\x05value\x18\x02 \x01(\v2\x1b.rpc.proto.user.GetUserRespR\x05value:\x028\x01\"U\n" +
+	"\x03key\x18\x01 \x01(\x03R\x03key\x12,\n" +
+	"\x05value\x18\x02 \x01(\v2\x16.mono.user.GetUserRespR\x05value:\x028\x01\"U\n" +
 	"\rUpdateUserReq\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\x03R\x03uid\x12\x1a\n" +
 	"\bnickname\x18\n" +
@@ -364,14 +364,14 @@ const file_user_proto_rawDesc = "" +
 	"\x03uid\x18\x01 \x01(\x03R\x03uid\x12\x1a\n" +
 	"\bnickname\x18\n" +
 	" \x01(\tR\bnickname\x12\x16\n" +
-	"\x06avatar\x18\v \x01(\tR\x06avatar2\xaf\x02\n" +
-	"\x04User\x12F\n" +
-	"\vGetUserInfo\x12\x1a.rpc.proto.user.GetUserReq\x1a\x1b.rpc.proto.user.GetUserResp\x12U\n" +
-	"\x10BatchGetUserInfo\x12\x1f.rpc.proto.user.BatchGetUserReq\x1a .rpc.proto.user.BatchGetUserResp\x12C\n" +
+	"\x06avatar\x18\v \x01(\tR\x06avatar2\x91\x02\n" +
+	"\x04User\x12<\n" +
+	"\vGetUserInfo\x12\x15.mono.user.GetUserReq\x1a\x16.mono.user.GetUserResp\x12K\n" +
+	"\x10BatchGetUserInfo\x12\x1a.mono.user.BatchGetUserReq\x1a\x1b.mono.user.BatchGetUserResp\x12>\n" +
 	"\n" +
-	"UpdateUser\x12\x1d.rpc.proto.user.UpdateUserReq\x1a\x16.google.protobuf.Empty\x12C\n" +
+	"UpdateUser\x12\x18.mono.user.UpdateUserReq\x1a\x16.google.protobuf.Empty\x12>\n" +
 	"\n" +
-	"CreateUser\x12\x1d.rpc.proto.user.CreateUserReq\x1a\x16.google.protobuf.EmptyB\tZ\amono/pbb\x06proto3"
+	"CreateUser\x12\x18.mono.user.CreateUserReq\x1a\x16.google.protobuf.EmptyB\x0eZ\fmono/pb/userb\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once
@@ -387,26 +387,26 @@ func file_user_proto_rawDescGZIP() []byte {
 
 var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_user_proto_goTypes = []any{
-	(*GetUserReq)(nil),       // 0: rpc.proto.user.GetUserReq
-	(*GetUserResp)(nil),      // 1: rpc.proto.user.GetUserResp
-	(*BatchGetUserReq)(nil),  // 2: rpc.proto.user.BatchGetUserReq
-	(*BatchGetUserResp)(nil), // 3: rpc.proto.user.BatchGetUserResp
-	(*UpdateUserReq)(nil),    // 4: rpc.proto.user.UpdateUserReq
-	(*CreateUserReq)(nil),    // 5: rpc.proto.user.CreateUserReq
-	nil,                      // 6: rpc.proto.user.BatchGetUserResp.UsersEntry
+	(*GetUserReq)(nil),       // 0: mono.user.GetUserReq
+	(*GetUserResp)(nil),      // 1: mono.user.GetUserResp
+	(*BatchGetUserReq)(nil),  // 2: mono.user.BatchGetUserReq
+	(*BatchGetUserResp)(nil), // 3: mono.user.BatchGetUserResp
+	(*UpdateUserReq)(nil),    // 4: mono.user.UpdateUserReq
+	(*CreateUserReq)(nil),    // 5: mono.user.CreateUserReq
+	nil,                      // 6: mono.user.BatchGetUserResp.UsersEntry
 	(*emptypb.Empty)(nil),    // 7: google.protobuf.Empty
 }
 var file_user_proto_depIdxs = []int32{
-	6, // 0: rpc.proto.user.BatchGetUserResp.users:type_name -> rpc.proto.user.BatchGetUserResp.UsersEntry
-	1, // 1: rpc.proto.user.BatchGetUserResp.UsersEntry.value:type_name -> rpc.proto.user.GetUserResp
-	0, // 2: rpc.proto.user.User.GetUserInfo:input_type -> rpc.proto.user.GetUserReq
-	2, // 3: rpc.proto.user.User.BatchGetUserInfo:input_type -> rpc.proto.user.BatchGetUserReq
-	4, // 4: rpc.proto.user.User.UpdateUser:input_type -> rpc.proto.user.UpdateUserReq
-	5, // 5: rpc.proto.user.User.CreateUser:input_type -> rpc.proto.user.CreateUserReq
-	1, // 6: rpc.proto.user.User.GetUserInfo:output_type -> rpc.proto.user.GetUserResp
-	3, // 7: rpc.proto.user.User.BatchGetUserInfo:output_type -> rpc.proto.user.BatchGetUserResp
-	7, // 8: rpc.proto.user.User.UpdateUser:output_type -> google.protobuf.Empty
-	7, // 9: rpc.proto.user.User.CreateUser:output_type -> google.protobuf.Empty
+	6, // 0: mono.user.BatchGetUserResp.users:type_name -> mono.user.BatchGetUserResp.UsersEntry
+	1, // 1: mono.user.BatchGetUserResp.UsersEntry.value:type_name -> mono.user.GetUserResp
+	0, // 2: mono.user.User.GetUserInfo:input_type -> mono.user.GetUserReq
+	2, // 3: mono.user.User.BatchGetUserInfo:input_type -> mono.user.BatchGetUserReq
+	4, // 4: mono.user.User.UpdateUser:input_type -> mono.user.UpdateUserReq
+	5, // 5: mono.user.User.CreateUser:input_type -> mono.user.CreateUserReq
+	1, // 6: mono.user.User.GetUserInfo:output_type -> mono.user.GetUserResp
+	3, // 7: mono.user.User.BatchGetUserInfo:output_type -> mono.user.BatchGetUserResp
+	7, // 8: mono.user.User.UpdateUser:output_type -> google.protobuf.Empty
+	7, // 9: mono.user.User.CreateUser:output_type -> google.protobuf.Empty
 	6, // [6:10] is the sub-list for method output_type
 	2, // [2:6] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

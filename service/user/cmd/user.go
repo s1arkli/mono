@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 
-	"mono/pb"
+	"mono/pb/user"
 	"mono/pkg/initial"
 	"mono/service/user/internal/interfaces"
 	"mono/service/user/pkg"
@@ -39,7 +39,7 @@ var userCmd = &cobra.Command{
 
 		s := grpc.NewServer()
 
-		pb.RegisterUserServer(s, interfaces.NewUser(db))
+		user.RegisterUserServer(s, interfaces.NewUser(db))
 
 		log.Printf("grpc server listening on :%s", port)
 		if err := s.Serve(listen); err != nil {

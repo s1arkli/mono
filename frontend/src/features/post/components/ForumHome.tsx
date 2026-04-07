@@ -11,6 +11,7 @@ import {
 } from 'react'
 import { fetchPostList, type PostFeedItem, type PostListItemDTO, type PostSortMode, type PostTopic } from '@/features/post'
 import type { ToastState } from '@/components/Toast'
+import { PageTabs } from '@/components/voice/PageTabs'
 import { ChevronDownIcon, PlusIcon, SearchIcon, StatIcon } from '@/features/post/components/PostIcons'
 import type { UserProfile } from '@/features/user'
 import { isServiceUnavailableError } from '@/lib/http/errors'
@@ -30,6 +31,7 @@ interface ForumHomeProps {
   onOpenAuth: () => void
   onOpenComposer: () => void
   onOpenDetail: (post: PostFeedItem) => void
+  onOpenVoice: () => void
   onOpenProfile: () => void
   onLogout: () => void
   onToast: (toast: ToastState) => void
@@ -54,6 +56,7 @@ export function ForumHome({
   onOpenAuth,
   onOpenComposer,
   onOpenDetail,
+  onOpenVoice,
   onOpenProfile,
   onLogout,
   onToast,
@@ -477,9 +480,12 @@ export function ForumHome({
     <div className={`forum-page forum-page--${mode}`}>
       <div className="forum-shell">
         <header className="forum-topbar">
-          <div className="forum-brand" aria-label="mono forum">
-            <span className="forum-brand__dot" />
-            <span className="forum-brand__text">mono</span>
+          <div className="forum-topbar__left">
+            <div className="forum-brand" aria-label="mono forum">
+              <span className="forum-brand__dot" />
+              <span className="forum-brand__text">mono</span>
+            </div>
+            <PageTabs activeTab="posts" onOpenPosts={() => undefined} onOpenVoice={onOpenVoice} />
           </div>
 
           <form className="forum-search" onSubmit={handleSearchSubmit}>

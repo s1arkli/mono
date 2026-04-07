@@ -7,14 +7,14 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
 
-	"mono/pb"
+	"mono/pb/user"
 	"mono/service/user/internal/infra"
 	"mono/service/user/internal/infra/model"
 	"mono/service/user/pkg"
 )
 
 type User struct {
-	pb.UnimplementedUserServer
+	user.UnimplementedUserServer
 	DB *gorm.DB
 }
 
@@ -24,24 +24,24 @@ func NewUser(db *gorm.DB) *User {
 	}
 }
 
-func (u *User) GetUserInfo(ctx context.Context, req *pb.GetUserReq) (*pb.GetUserResp, error) {
+func (u *User) GetUserInfo(ctx context.Context, req *user.GetUserReq) (*user.GetUserResp, error) {
 	data, err := infra.GetUserInfo(u.DB, ctx, req.Uid)
 	if err != nil {
 		return nil, status.Error(1, err.Error())
 	}
 	if data == nil {
-		return &pb.GetUserResp{}, nil
+		return &user.GetUserResp{}, nil
 	}
-	return &pb.GetUserResp{
+	return &user.GetUserResp{
 		Uid:      data.UID,
 		Nickname: data.Nickname,
 		Avatar:   data.Avatar,
 	}, nil
 }
 
-func (u *User) BatchGetUserInfo(ctx context.Context, req *pb.BatchGetUserReq) (*pb.BatchGetUserResp, error) {
+func (u *User) BatchGetUserInfo(ctx context.Context, req *user.BatchGetUserReq) (*user.BatchGetUserResp, error) {
 	if len(req.Uids) == 0 {
-		return &pb.BatchGetUserResp{}, nil
+		return &user.BatchGetUserResp{}, nil
 	}
 	req.Uids = pkg.Unique(req.Uids)
 
@@ -50,23 +50,23 @@ func (u *User) BatchGetUserInfo(ctx context.Context, req *pb.BatchGetUserReq) (*
 		return nil, status.Error(1, err.Error())
 	}
 	if data == nil {
-		return &pb.BatchGetUserResp{}, nil
+		return &user.BatchGetUserResp{}, nil
 	}
 
-	res := make(map[int64]*pb.GetUserResp)
+	res := make(map[int64]*user.GetUserResp)
 	for _, v := range data {
-		res[v.UID] = &pb.GetUserResp{
+		res[v.UID] = &user.GetUserResp{
 			Uid:      v.UID,
 			Nickname: v.Nickname,
 			Avatar:   v.Avatar,
 		}
 	}
-	return &pb.BatchGetUserResp{
+	return &user.BatchGetUserResp{
 		Users: res,
 	}, nil
 }
 
-func (u *User) UpdateUser(ctx context.Context, req *pb.UpdateUserReq) (*emptypb.Empty, error) {
+func (u *User) UpdateUser(ctx context.Context, req *user.UpdateUserReq) (*emptypb.Empty, error) {
 	err := infra.UpdateUser(u.DB, ctx, &model.User{
 		UID:      req.Uid,
 		Nickname: req.Nickname,
@@ -78,7 +78,7 @@ func (u *User) UpdateUser(ctx context.Context, req *pb.UpdateUserReq) (*emptypb.
 	return &emptypb.Empty{}, nil
 }
 
-func (u *User) CreateUser(ctx context.Context, req *pb.CreateUserReq) (*emptypb.Empty, error) {
+func (u *User) CreateUser(ctx context.Context, req *user.CreateUserReq) (*emptypb.Empty, error) {
 	data, err := infra.GetUserInfo(u.DB, ctx, req.Uid)
 	if err != nil {
 		return &emptypb.Empty{}, status.Error(1, err.Error())

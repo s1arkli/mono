@@ -11,7 +11,8 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
 
-	authpb "mono/pb"
+	"mono/pb/auth"
+	"mono/pb/user"
 	"mono/pkg/jwt"
 	"mono/service/auth/internal/infra/dal"
 	"mono/service/auth/internal/infra/model"
@@ -19,12 +20,12 @@ import (
 )
 
 type Auth struct {
-	authpb.UnimplementedAuthServiceServer
+	auth.UnimplementedAuthServiceServer
 	DB   *gorm.DB
-	User authpb.UserClient
+	User user.UserClient
 }
 
-func (a *Auth) Register(ctx context.Context, req *authpb.RegisterReq) (*emptypb.Empty, error) {
+func (a *Auth) Register(ctx context.Context, req *auth.RegisterReq) (*emptypb.Empty, error) {
 
 	is, _ := a.isExist(ctx, req.Account)
 	if is {
@@ -52,7 +53,7 @@ func (a *Auth) isExist(ctx context.Context, account string) (bool, *model.Accoun
 	return false, nil
 }
 
-func (a *Auth) create(ctx context.Context, req *authpb.RegisterReq) error {
+func (a *Auth) create(ctx context.Context, req *auth.RegisterReq) error {
 	aDal := dal.Use(a.DB).Account
 
 	pwd, _ := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
@@ -66,7 +67,7 @@ func (a *Auth) create(ctx context.Context, req *authpb.RegisterReq) error {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-func (a *Auth) Login(ctx context.Context, loginReq *authpb.LoginReq) (*authpb.LoginResp, error) {
+func (a *Auth) Login(ctx context.Context, loginReq *auth.LoginReq) (*auth.LoginResp, error) {
 	is, data := a.isExist(ctx, loginReq.Account)
 	if !is {
 		return nil, status.Error(1, "account does not exist")
@@ -79,13 +80,13 @@ func (a *Auth) Login(ctx context.Context, loginReq *authpb.LoginReq) (*authpb.Lo
 	rToken, err := jwt.GenerateToken(data.UID, 7*time.Hour*24, jwt.RefreshToken)
 	aToken, err := jwt.GenerateToken(data.UID, 15*time.Minute, jwt.AccessToken)
 
-	userInfo, err := a.User.GetUserInfo(ctx, &authpb.GetUserReq{
+	userInfo, err := a.User.GetUserInfo(ctx, &user.GetUserReq{
 		Uid: data.UID,
 	})
 	if err != nil {
 		return nil, status.Error(3, "err uid")
 	}
-	return &authpb.LoginResp{
+	return &auth.LoginResp{
 		AccessToken:  aToken,
 		RefreshToken: rToken,
 		Uid:          data.UID,
@@ -103,23 +104,23 @@ func (a *Auth) isRightPwd(pwd, pwdReq string) bool {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-func (a *Auth) Refresh(ctx context.Context, req *authpb.RefreshReq) (*authpb.RefreshResp, error) {
+func (a *Auth) Refresh(ctx context.Context, req *auth.RefreshReq) (*auth.RefreshResp, error) {
 	claim, err := jwt.ParseToken(req.RefreshToken)
 	if err != nil || claim == nil {
-		return &authpb.RefreshResp{}, status.Error(1, "err refresh token")
+		return &auth.RefreshResp{}, status.Error(1, "err refresh token")
 	}
 
 	if claim.TokenType != jwt.RefreshToken {
-		return &authpb.RefreshResp{}, status.Error(2, "token is invalid")
+		return &auth.RefreshResp{}, status.Error(2, "token is invalid")
 	}
 
 	rToken, err := jwt.GenerateToken(claim.Uid, 7*time.Hour*24, jwt.RefreshToken)
 	aToken, err := jwt.GenerateToken(claim.Uid, 15*time.Minute, jwt.AccessToken)
 
 	if err != nil {
-		return &authpb.RefreshResp{}, status.Error(3, "generate token err")
+		return &auth.RefreshResp{}, status.Error(3, "generate token err")
 	}
-	return &authpb.RefreshResp{
+	return &auth.RefreshResp{
 		AccessToken:  aToken,
 		RefreshToken: rToken,
 	}, nil

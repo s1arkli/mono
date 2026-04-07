@@ -6,6 +6,12 @@ package mono.auth;
 
 option go_package = "mono/pb/auth";
 
+service AuthService{
+  rpc Register(RegisterReq) returns (google.protobuf.Empty);
+  rpc Login(LoginReq) returns (LoginResp);
+  rpc Refresh(RefreshReq)returns (RefreshResp);
+}
+
 message RegisterReq {
   string account = 1;
   string password = 2;
@@ -37,8 +43,3 @@ message RefreshResp {
   string refresh_token = 2;
 }
 
-service AuthService{
-  rpc Register(RegisterReq) returns (google.protobuf.Empty);
-  rpc Login(LoginReq) returns (LoginResp);
-  rpc Refresh(RefreshReq)returns (RefreshResp);
-}

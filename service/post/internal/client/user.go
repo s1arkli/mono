@@ -7,10 +7,10 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"mono/pb"
+	"mono/pb/user"
 )
 
-func InitUserClient() pb.UserClient {
+func InitUserClient() user.UserClient {
 	conn, err := grpc.NewClient(
 		fmt.Sprintf("%s:%s", viper.GetString("service.user.grpc"), viper.GetString("service.user.port")),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -18,5 +18,5 @@ func InitUserClient() pb.UserClient {
 	if err != nil {
 		panic(err)
 	}
-	return pb.NewUserClient(conn)
+	return user.NewUserClient(conn)
 }

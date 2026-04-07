@@ -6,20 +6,21 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"mono/pb"
+	"mono/pb/post"
+	"mono/pb/user"
 	"mono/service/post/internal/infra"
 )
 
 type Post struct {
-	pb.UnimplementedPostServer
+	post.UnimplementedPostServer
 	post    *infra.Post
 	comment *infra.Comment
 	like    *infra.Like
 
-	userClient pb.UserClient
+	userClient user.UserClient
 }
 
-func NewPost(post *infra.Post, comment *infra.Comment, like *infra.Like, user pb.UserClient) *Post {
+func NewPost(post *infra.Post, comment *infra.Comment, like *infra.Like, user user.UserClient) *Post {
 	return &Post{
 		post:    post,
 		comment: comment,
@@ -29,8 +30,8 @@ func NewPost(post *infra.Post, comment *infra.Comment, like *infra.Like, user pb
 	}
 }
 
-func (p *Post) List(ctx context.Context, req *pb.PostListReq) (*pb.PostListResp, error) {
-	errRes := &pb.PostListResp{}
+func (p *Post) List(ctx context.Context, req *post.PostListReq) (*post.PostListResp, error) {
+	errRes := &post.PostListResp{}
 
 	data, total, err := p.post.List(ctx, req)
 	if err != nil {
@@ -40,7 +41,7 @@ func (p *Post) List(ctx context.Context, req *pb.PostListReq) (*pb.PostListResp,
 		return errRes, nil
 	}
 	resp, uids := postModelsToPB(data, total)
-	userMap, err := p.userClient.BatchGetUserInfo(ctx, &pb.BatchGetUserReq{Uids: uids})
+	userMap, err := p.userClient.BatchGetUserInfo(ctx, &user.BatchGetUserReq{Uids: uids})
 	if err == nil {
 		appendUserInfo(resp, userMap.Users)
 	}
@@ -60,19 +61,19 @@ func (p *Post) List(ctx context.Context, req *pb.PostListReq) (*pb.PostListResp,
 	return resp, nil
 }
 
-func (p *Post) Create(ctx context.Context, req *pb.PostCreateReq) (*emptypb.Empty, error) {
+func (p *Post) Create(ctx context.Context, req *post.PostCreateReq) (*emptypb.Empty, error) {
 	if err := p.post.Create(ctx, req); err != nil {
 		return &emptypb.Empty{}, status.Error(1, err.Error())
 	}
 	return &emptypb.Empty{}, nil
 }
 
-func (p *Post) Detail(ctx context.Context, req *pb.PostDetailReq) (*pb.PostDetailResp, error) {
+func (p *Post) Detail(ctx context.Context, req *post.PostDetailReq) (*post.PostDetailResp, error) {
 	data, err := p.post.Detail(ctx, req)
 	if err != nil {
 		return nil, status.Error(1, err.Error())
 	}
-	res := &pb.PostDetailResp{
+	res := &post.PostDetailResp{
 		Title:        data.Title,
 		Content:      data.Content,
 		Uid:          data.UID,
@@ -83,10 +84,10 @@ func (p *Post) Detail(ctx context.Context, req *pb.PostDetailReq) (*pb.PostDetai
 		ViewCount:    data.ViewCount,
 	}
 
-	user, err := p.userClient.GetUserInfo(ctx, &pb.GetUserReq{Uid: data.UID})
+	userInfo, err := p.userClient.GetUserInfo(ctx, &user.GetUserReq{Uid: data.UID})
 	if err == nil {
-		res.Avatar = user.Avatar
-		res.Nickname = user.Nickname
+		res.Avatar = userInfo.Avatar
+		res.Nickname = userInfo.Nickname
 	}
 
 	// 设置 is_liked

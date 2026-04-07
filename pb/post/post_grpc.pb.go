@@ -4,7 +4,7 @@
 // - protoc             v6.33.4
 // source: post.proto
 
-package pb
+package post
 
 import (
 	context "context"
@@ -20,12 +20,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Post_List_FullMethodName           = "/rpc.proto.post.Post/List"
-	Post_Create_FullMethodName         = "/rpc.proto.post.Post/Create"
-	Post_Detail_FullMethodName         = "/rpc.proto.post.Post/Detail"
-	Post_GetPostComment_FullMethodName = "/rpc.proto.post.Post/GetPostComment"
-	Post_SetComment_FullMethodName     = "/rpc.proto.post.Post/SetComment"
-	Post_SetLikeComment_FullMethodName = "/rpc.proto.post.Post/SetLikeComment"
+	Post_List_FullMethodName           = "/mono.post.Post/List"
+	Post_Create_FullMethodName         = "/mono.post.Post/Create"
+	Post_Detail_FullMethodName         = "/mono.post.Post/Detail"
+	Post_GetPostComment_FullMethodName = "/mono.post.Post/GetPostComment"
+	Post_SetComment_FullMethodName     = "/mono.post.Post/SetComment"
+	Post_SetLikeComment_FullMethodName = "/mono.post.Post/SetLikeComment"
 )
 
 // PostClient is the client API for Post service.
@@ -279,7 +279,7 @@ func _Post_SetLikeComment_Handler(srv interface{}, ctx context.Context, dec func
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Post_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "rpc.proto.post.Post",
+	ServiceName: "mono.post.Post",
 	HandlerType: (*PostServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

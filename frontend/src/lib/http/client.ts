@@ -34,7 +34,7 @@ function buildBaseCandidates(candidates?: string[]) {
  * @returns Promise<TResponse>，后端业务成功后的 data 字段。
  * @example
  * ```ts
- * const data = await postJson<LoginData, LoginPayload>('/login', {
+ * const data = await postJson<LoginData, LoginPayload>('/auth', {
  *   account: 'demo',
  *   password: '12345678',
  * })

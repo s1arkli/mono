@@ -11,6 +11,7 @@ import (
 	"mono/gateway/service/post"
 	"mono/gateway/service/resource"
 	"mono/gateway/service/user"
+	"mono/gateway/service/voice"
 	"mono/pkg/middleware"
 	authPkg "mono/service/auth/pkg"
 	postPkg "mono/service/post/pkg"
@@ -74,5 +75,13 @@ func Api(r *gin.Engine) {
 
 		ui := v1.Group("/resource")
 		ui.POST("/upload/avatar", service.Avatar)
+	}
+
+	{
+		//语音
+		service := voice.NewService()
+
+		ui := v1.Group("/voice")
+		ui.POST("/join", service.JoinChatRoom)
 	}
 }
