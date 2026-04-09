@@ -23,6 +23,7 @@ const (
 	Node_ListNode_FullMethodName   = "/mono.node.Node/ListNode"
 	Node_CreateNode_FullMethodName = "/mono.node.Node/CreateNode"
 	Node_UpdateNode_FullMethodName = "/mono.node.Node/UpdateNode"
+	Node_DeleteNode_FullMethodName = "/mono.node.Node/DeleteNode"
 )
 
 // NodeClient is the client API for Node service.
@@ -32,6 +33,7 @@ type NodeClient interface {
 	ListNode(ctx context.Context, in *ListNodeReq, opts ...grpc.CallOption) (*ListNodeResp, error)
 	CreateNode(ctx context.Context, in *CreateReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateNode(ctx context.Context, in *UpdateReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteNode(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type nodeClient struct {
@@ -72,6 +74,16 @@ func (c *nodeClient) UpdateNode(ctx context.Context, in *UpdateReq, opts ...grpc
 	return out, nil
 }
 
+func (c *nodeClient) DeleteNode(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Node_DeleteNode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NodeServer is the server API for Node service.
 // All implementations must embed UnimplementedNodeServer
 // for forward compatibility.
@@ -79,6 +91,7 @@ type NodeServer interface {
 	ListNode(context.Context, *ListNodeReq) (*ListNodeResp, error)
 	CreateNode(context.Context, *CreateReq) (*emptypb.Empty, error)
 	UpdateNode(context.Context, *UpdateReq) (*emptypb.Empty, error)
+	DeleteNode(context.Context, *DeleteReq) (*emptypb.Empty, error)
 	mustEmbedUnimplementedNodeServer()
 }
 
@@ -97,6 +110,9 @@ func (UnimplementedNodeServer) CreateNode(context.Context, *CreateReq) (*emptypb
 }
 func (UnimplementedNodeServer) UpdateNode(context.Context, *UpdateReq) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateNode not implemented")
+}
+func (UnimplementedNodeServer) DeleteNode(context.Context, *DeleteReq) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteNode not implemented")
 }
 func (UnimplementedNodeServer) mustEmbedUnimplementedNodeServer() {}
 func (UnimplementedNodeServer) testEmbeddedByValue()              {}
@@ -173,6 +189,24 @@ func _Node_UpdateNode_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Node_DeleteNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServer).DeleteNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Node_DeleteNode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServer).DeleteNode(ctx, req.(*DeleteReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Node_ServiceDesc is the grpc.ServiceDesc for Node service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -191,6 +225,10 @@ var Node_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateNode",
 			Handler:    _Node_UpdateNode_Handler,
+		},
+		{
+			MethodName: "DeleteNode",
+			Handler:    _Node_DeleteNode_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -11,6 +11,7 @@ service Node{
   rpc ListNode(ListNodeReq) returns (ListNodeResp);
   rpc CreateNode(CreateReq) returns (google.protobuf.Empty);
   rpc UpdateNode(UpdateReq) returns (google.protobuf.Empty);
+  rpc DeleteNode(DeleteReq) returns (google.protobuf.Empty);
 }
 
 // ListNode 获取某个节点下的文件，parent_id=null即为根节点
@@ -56,4 +57,10 @@ message UpdateReq {
   int64 id  = 2;
   string title = 3;
   string content = 4;
+}
+
+// 删除节点
+message DeleteReq {
+  int64 uid = 1;
+  int64 id = 2;
 }

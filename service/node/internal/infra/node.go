@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"gorm.io/gen/field"
 	"gorm.io/gorm"
 
 	"mono/service/node/internal/infra/dal"
@@ -95,4 +96,26 @@ func (n *Node) Update(ctx context.Context, node *model.Node) error {
 		return fmt.Errorf("node not found: uid=%d id=%d", node.UID, node.ID)
 	}
 	return nil
+}
+
+func (n *Node) Delete(ctx context.Context, uid, id int64) error {
+	data, err := n.GetNode(ctx, uid, id)
+	if err != nil {
+		return err
+	}
+	if data == nil {
+		return fmt.Errorf("node not found: uid=%d id=%d", uid, id)
+	}
+
+	nDal := dal.Use(n.db).Node
+	_, err = nDal.WithContext(ctx).
+		Where(
+			nDal.UID.Eq(uid),
+			field.Or(
+				nDal.ID.Eq(id),
+				nDal.Path.Like(data.Path+"/%"),
+			),
+		).
+		Delete()
+	return err
 }

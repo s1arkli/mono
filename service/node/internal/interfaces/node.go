@@ -87,3 +87,10 @@ func (n *Node) UpdateNode(ctx context.Context, req *node.UpdateReq) (*emptypb.Em
 	}
 	return &emptypb.Empty{}, nil
 }
+
+func (n *Node) DeleteNode(ctx context.Context, req *node.DeleteReq) (*emptypb.Empty, error) {
+	if err := n.Node.Delete(ctx, req.Uid, req.Id); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &emptypb.Empty{}, nil
+}
