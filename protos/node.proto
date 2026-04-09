@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 
 package mono.node;
 
@@ -8,6 +9,7 @@ option go_package = "mono/pb/node";
 
 service Node{
   rpc ListNode(ListNodeReq) returns (ListNodeResp);
+  rpc CreateNode(CreateReq) returns (google.protobuf.Empty);
 }
 
 // ListNode 获取某个节点下的文件，parent_id=null即为根节点
@@ -38,4 +40,19 @@ message NodeItem {
   int32 sort = 8;
 }
 
-//
+// Create 创建文件夹或者笔记
+message CreateReq {
+  int64 uid = 1;
+  NodeType type = 2;
+  optional int64 parent_id = 3;
+  string title = 4;
+  string content = 5;
+}
+
+// Update 更新folder name或者笔记
+message UpdateReq {
+  int64 uid = 1;
+  int64 id  = 2;
+  string title = 3;
+  string content = 4;
+}

@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS node (
     uid BIGINT NOT NULL ,
     type int NOT NULL DEFAULT 2,-- 1= folder 2= note
     parent_id BIGINT REFERENCES node(id), -- 代表此字段的值只能是file表里的id的某个值。也对应上了语义。
-    title varchar(64) NOT NULL ,
+    title varchar(64) NOT NULL , -- folder name & note title
     content TEXT NOT NULL DEFAULT '',
     path varchar(1000) NOT NULL ,-- 使用id做路径，保证唯一性
     sort int NOT NULL DEFAULT 0,

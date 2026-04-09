@@ -2,6 +2,7 @@ package infra
 
 import (
 	"context"
+	"errors"
 
 	"gorm.io/gorm"
 
@@ -19,6 +20,13 @@ func NewNode(db *gorm.DB) *Node {
 	}
 }
 
+func (n *Node) Transaction(ctx context.Context, f func(ctx context.Context, node *Node) error) error {
+	return n.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		node := NewNode(tx)
+		return f(ctx, node)
+	})
+}
+
 func (n *Node) ListNodes(ctx context.Context, uid int64, parentID *int64) ([]*model.Node, error) {
 	nDal := dal.Use(n.db).Node
 	query := nDal.WithContext(ctx).Where(nDal.UID.Eq(uid))
@@ -30,4 +38,42 @@ func (n *Node) ListNodes(ctx context.Context, uid int64, parentID *int64) ([]*mo
 	}
 
 	return query.Find()
+}
+
+func (n *Node) GetNode(ctx context.Context, uid, id int64) (*model.Node, error) {
+	nDal := dal.Use(n.db).Node
+	data, err := nDal.WithContext(ctx).Where(nDal.UID.Eq(uid), nDal.ID.Eq(id)).First()
+	if err != nil && !errors.Is(gorm.ErrRecordNotFound, err) {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (n *Node) GetSort(ctx context.Context, uid int64, parentID *int64) (int, error) {
+	nDal := dal.Use(n.db).Node
+	query := nDal.WithContext(ctx).Where(nDal.UID.Eq(uid))
+
+	if parentID != nil {
+		query = query.Where(nDal.ParentID.Eq(*parentID))
+	} else {
+		query = query.Where(nDal.ParentID.IsNull())
+	}
+
+	sort := 0
+	err := query.Order(nDal.Sort.Desc()).Select(nDal.Sort).Scan(&sort)
+	if err != nil && !errors.Is(gorm.ErrRecordNotFound, err) {
+		return 0, err
+	}
+	return sort + 1, nil
+}
+
+func (n *Node) Create(ctx context.Context, node *model.Node) error {
+	nDal := dal.Use(n.db).Node
+	return nDal.WithContext(ctx).Create(node)
+}
+
+func (n *Node) UpdatePath(ctx context.Context, node *model.Node) error {
+	nDal := dal.Use(n.db).Node
+	_, err := nDal.WithContext(ctx).Where(nDal.ID.Eq(node.ID)).Update(nDal.Path, node.Path)
+	return err
 }

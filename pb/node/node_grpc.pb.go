@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,7 +20,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Node_ListNode_FullMethodName = "/mono.node.Node/ListNode"
+	Node_ListNode_FullMethodName   = "/mono.node.Node/ListNode"
+	Node_CreateNode_FullMethodName = "/mono.node.Node/CreateNode"
 )
 
 // NodeClient is the client API for Node service.
@@ -27,6 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NodeClient interface {
 	ListNode(ctx context.Context, in *ListNodeReq, opts ...grpc.CallOption) (*ListNodeResp, error)
+	CreateNode(ctx context.Context, in *CreateReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type nodeClient struct {
@@ -47,11 +50,22 @@ func (c *nodeClient) ListNode(ctx context.Context, in *ListNodeReq, opts ...grpc
 	return out, nil
 }
 
+func (c *nodeClient) CreateNode(ctx context.Context, in *CreateReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Node_CreateNode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NodeServer is the server API for Node service.
 // All implementations must embed UnimplementedNodeServer
 // for forward compatibility.
 type NodeServer interface {
 	ListNode(context.Context, *ListNodeReq) (*ListNodeResp, error)
+	CreateNode(context.Context, *CreateReq) (*emptypb.Empty, error)
 	mustEmbedUnimplementedNodeServer()
 }
 
@@ -64,6 +78,9 @@ type UnimplementedNodeServer struct{}
 
 func (UnimplementedNodeServer) ListNode(context.Context, *ListNodeReq) (*ListNodeResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListNode not implemented")
+}
+func (UnimplementedNodeServer) CreateNode(context.Context, *CreateReq) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateNode not implemented")
 }
 func (UnimplementedNodeServer) mustEmbedUnimplementedNodeServer() {}
 func (UnimplementedNodeServer) testEmbeddedByValue()              {}
@@ -104,6 +121,24 @@ func _Node_ListNode_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Node_CreateNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServer).CreateNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Node_CreateNode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServer).CreateNode(ctx, req.(*CreateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Node_ServiceDesc is the grpc.ServiceDesc for Node service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +149,10 @@ var Node_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListNode",
 			Handler:    _Node_ListNode_Handler,
+		},
+		{
+			MethodName: "CreateNode",
+			Handler:    _Node_CreateNode_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

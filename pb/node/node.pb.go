@@ -9,6 +9,7 @@ package node
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -268,12 +269,89 @@ func (x *NodeItem) GetSort() int32 {
 	return 0
 }
 
+// Create 创建文件夹或者笔记
+type CreateReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Uid           int64                  `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	Type          NodeType               `protobuf:"varint,2,opt,name=type,proto3,enum=mono.node.NodeType" json:"type,omitempty"`
+	ParentId      *int64                 `protobuf:"varint,3,opt,name=parent_id,json=parentId,proto3,oneof" json:"parent_id,omitempty"`
+	Title         string                 `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
+	Content       string                 `protobuf:"bytes,5,opt,name=content,proto3" json:"content,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateReq) Reset() {
+	*x = CreateReq{}
+	mi := &file_node_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateReq) ProtoMessage() {}
+
+func (x *CreateReq) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateReq.ProtoReflect.Descriptor instead.
+func (*CreateReq) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CreateReq) GetUid() int64 {
+	if x != nil {
+		return x.Uid
+	}
+	return 0
+}
+
+func (x *CreateReq) GetType() NodeType {
+	if x != nil {
+		return x.Type
+	}
+	return NodeType_NODE_TYPE_UNSPECIFIED
+}
+
+func (x *CreateReq) GetParentId() int64 {
+	if x != nil && x.ParentId != nil {
+		return *x.ParentId
+	}
+	return 0
+}
+
+func (x *CreateReq) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *CreateReq) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
 var File_node_proto protoreflect.FileDescriptor
 
 const file_node_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"node.proto\x12\tmono.node\x1a\x1fgoogle/protobuf/timestamp.proto\"O\n" +
+	"node.proto\x12\tmono.node\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\"O\n" +
 	"\vListNodeReq\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\x03R\x03uid\x12 \n" +
 	"\tparent_id\x18\x02 \x01(\x03H\x00R\bparentId\x88\x01\x01B\f\n" +
@@ -293,13 +371,23 @@ const file_node_proto_rawDesc = "" +
 	"updated_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x12\n" +
 	"\x04sort\x18\b \x01(\x05R\x04sortB\f\n" +
 	"\n" +
+	"_parent_id\"\xa6\x01\n" +
+	"\tCreateReq\x12\x10\n" +
+	"\x03uid\x18\x01 \x01(\x03R\x03uid\x12'\n" +
+	"\x04type\x18\x02 \x01(\x0e2\x13.mono.node.NodeTypeR\x04type\x12 \n" +
+	"\tparent_id\x18\x03 \x01(\x03H\x00R\bparentId\x88\x01\x01\x12\x14\n" +
+	"\x05title\x18\x04 \x01(\tR\x05title\x12\x18\n" +
+	"\acontent\x18\x05 \x01(\tR\acontentB\f\n" +
+	"\n" +
 	"_parent_id*O\n" +
 	"\bNodeType\x12\x19\n" +
 	"\x15NODE_TYPE_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10NODE_TYPE_FOLDER\x10\x01\x12\x12\n" +
-	"\x0eNODE_TYPE_NOTE\x10\x022C\n" +
+	"\x0eNODE_TYPE_NOTE\x10\x022\x7f\n" +
 	"\x04Node\x12;\n" +
-	"\bListNode\x12\x16.mono.node.ListNodeReq\x1a\x17.mono.node.ListNodeRespB\x0eZ\fmono/pb/nodeb\x06proto3"
+	"\bListNode\x12\x16.mono.node.ListNodeReq\x1a\x17.mono.node.ListNodeResp\x12:\n" +
+	"\n" +
+	"CreateNode\x12\x14.mono.node.CreateReq\x1a\x16.google.protobuf.EmptyB\x0eZ\fmono/pb/nodeb\x06proto3"
 
 var (
 	file_node_proto_rawDescOnce sync.Once
@@ -314,26 +402,31 @@ func file_node_proto_rawDescGZIP() []byte {
 }
 
 var file_node_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_node_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_node_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_node_proto_goTypes = []any{
 	(NodeType)(0),                 // 0: mono.node.NodeType
 	(*ListNodeReq)(nil),           // 1: mono.node.ListNodeReq
 	(*ListNodeResp)(nil),          // 2: mono.node.ListNodeResp
 	(*NodeItem)(nil),              // 3: mono.node.NodeItem
-	(*timestamppb.Timestamp)(nil), // 4: google.protobuf.Timestamp
+	(*CreateReq)(nil),             // 4: mono.node.CreateReq
+	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),         // 6: google.protobuf.Empty
 }
 var file_node_proto_depIdxs = []int32{
 	3, // 0: mono.node.ListNodeResp.list:type_name -> mono.node.NodeItem
 	0, // 1: mono.node.NodeItem.type:type_name -> mono.node.NodeType
-	4, // 2: mono.node.NodeItem.created_at:type_name -> google.protobuf.Timestamp
-	4, // 3: mono.node.NodeItem.updated_at:type_name -> google.protobuf.Timestamp
-	1, // 4: mono.node.Node.ListNode:input_type -> mono.node.ListNodeReq
-	2, // 5: mono.node.Node.ListNode:output_type -> mono.node.ListNodeResp
-	5, // [5:6] is the sub-list for method output_type
-	4, // [4:5] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	5, // 2: mono.node.NodeItem.created_at:type_name -> google.protobuf.Timestamp
+	5, // 3: mono.node.NodeItem.updated_at:type_name -> google.protobuf.Timestamp
+	0, // 4: mono.node.CreateReq.type:type_name -> mono.node.NodeType
+	1, // 5: mono.node.Node.ListNode:input_type -> mono.node.ListNodeReq
+	4, // 6: mono.node.Node.CreateNode:input_type -> mono.node.CreateReq
+	2, // 7: mono.node.Node.ListNode:output_type -> mono.node.ListNodeResp
+	6, // 8: mono.node.Node.CreateNode:output_type -> google.protobuf.Empty
+	7, // [7:9] is the sub-list for method output_type
+	5, // [5:7] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_node_proto_init() }
@@ -343,13 +436,14 @@ func file_node_proto_init() {
 	}
 	file_node_proto_msgTypes[0].OneofWrappers = []any{}
 	file_node_proto_msgTypes[2].OneofWrappers = []any{}
+	file_node_proto_msgTypes[3].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_node_proto_rawDesc), len(file_node_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
