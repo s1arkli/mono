@@ -75,3 +75,15 @@ func (n *Node) CreateNode(ctx context.Context, req *node.CreateReq) (*emptypb.Em
 	}
 	return &emptypb.Empty{}, nil
 }
+
+func (n *Node) UpdateNode(ctx context.Context, req *node.UpdateReq) (*emptypb.Empty, error) {
+	if err := n.Node.Update(ctx, &model.Node{
+		ID:      req.Id,
+		UID:     req.Uid,
+		Title:   req.Title,
+		Content: req.Content,
+	}); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &emptypb.Empty{}, nil
+}

@@ -3,6 +3,7 @@ package infra
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 
@@ -76,4 +77,22 @@ func (n *Node) UpdatePath(ctx context.Context, node *model.Node) error {
 	nDal := dal.Use(n.db).Node
 	_, err := nDal.WithContext(ctx).Where(nDal.ID.Eq(node.ID)).Update(nDal.Path, node.Path)
 	return err
+}
+
+func (n *Node) Update(ctx context.Context, node *model.Node) error {
+	nDal := dal.Use(n.db).Node
+
+	res, err := nDal.WithContext(ctx).
+		Where(nDal.UID.Eq(node.UID), nDal.ID.Eq(node.ID)).
+		UpdateSimple(
+			nDal.Title.Value(node.Title),
+			nDal.Content.Value(node.Content),
+		)
+	if err != nil {
+		return err
+	}
+	if res.RowsAffected == 0 {
+		return fmt.Errorf("node not found: uid=%d id=%d", node.UID, node.ID)
+	}
+	return nil
 }
