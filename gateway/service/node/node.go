@@ -2,6 +2,7 @@ package node
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
 	"mono/gateway/ecode"
@@ -11,12 +12,14 @@ import (
 )
 
 type Service struct {
-	node node.NodeClient
+	node        node.NodeClient
+	sugarLogger *zap.SugaredLogger
 }
 
-func NewService(conn *grpc.ClientConn) *Service {
+func NewService(conn *grpc.ClientConn, sugarLogger *zap.SugaredLogger) *Service {
 	return &Service{
-		node: node.NewNodeClient(conn),
+		node:        node.NewNodeClient(conn),
+		sugarLogger: sugarLogger,
 	}
 }
 

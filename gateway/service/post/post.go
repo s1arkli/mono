@@ -2,6 +2,7 @@ package post
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
 	"mono/gateway/ecode"
@@ -11,12 +12,14 @@ import (
 )
 
 type Service struct {
-	post post.PostClient
+	post        post.PostClient
+	sugarLogger *zap.SugaredLogger
 }
 
-func NewService(conn *grpc.ClientConn) *Service {
+func NewService(conn *grpc.ClientConn, sugarLogger *zap.SugaredLogger) *Service {
 	return &Service{
-		post: post.NewPostClient(conn),
+		post:        post.NewPostClient(conn),
+		sugarLogger: sugarLogger,
 	}
 }
 

@@ -2,6 +2,7 @@ package auth
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
 	"mono/pb/auth"
@@ -11,12 +12,14 @@ import (
 )
 
 type Service struct {
-	auth auth.AuthServiceClient
+	auth        auth.AuthServiceClient
+	sugarLogger *zap.SugaredLogger
 }
 
-func NewService(conn *grpc.ClientConn) *Service {
+func NewService(conn *grpc.ClientConn, sugarLogger *zap.SugaredLogger) *Service {
 	return &Service{
-		auth: auth.NewAuthServiceClient(conn),
+		auth:        auth.NewAuthServiceClient(conn),
+		sugarLogger: sugarLogger,
 	}
 }
 

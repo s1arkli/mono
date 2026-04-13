@@ -4,15 +4,14 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.uber.org/zap"
 
 	_ "mono/gateway/doc/app" // 必须匿名导入生成的 docs 包
 	"mono/gateway/grpc"
 	"mono/gateway/service/auth"
 	nodeService "mono/gateway/service/node"
 	"mono/gateway/service/post"
-	"mono/gateway/service/resource"
 	"mono/gateway/service/user"
-	"mono/gateway/service/voice"
 	"mono/pkg/middleware"
 	authPkg "mono/service/auth/pkg"
 	nodePkg "mono/service/node/pkg"
@@ -20,10 +19,11 @@ import (
 	userPkg "mono/service/user/pkg"
 )
 
-func Api(r *gin.Engine) {
+func Api(r *gin.Engine, zap *zap.SugaredLogger) {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	v1 := r.Group("/api/v1")
+	v1.Use(middleware.Log())
 
 	{
 		//登录
@@ -31,7 +31,7 @@ func Api(r *gin.Engine) {
 		if err != nil {
 			panic(err)
 		}
-		service := auth.NewService(conn)
+		service := auth.NewService(conn, zap)
 
 		acc := v1.Group("/account").Use()
 		acc.POST("/register", service.Register)
@@ -45,7 +45,7 @@ func Api(r *gin.Engine) {
 		if err != nil {
 			panic(err)
 		}
-		service := post.NewService(conn)
+		service := post.NewService(conn, zap)
 
 		p := v1.Group("/post")
 		p.POST("/list", service.List)
@@ -64,7 +64,7 @@ func Api(r *gin.Engine) {
 		if err != nil {
 			panic(err)
 		}
-		service := user.NewService(conn)
+		service := user.NewService(conn, zap)
 
 		p := v1.Group("/user")
 		p.POST("/batch", service.BatchGetUsersInfo)
@@ -77,7 +77,7 @@ func Api(r *gin.Engine) {
 		if err != nil {
 			panic(err)
 		}
-		service := nodeService.NewService(conn)
+		service := nodeService.NewService(conn, zap)
 
 		ui := v1.Group("/node")
 		ui.Use(middleware.Auth())
@@ -87,12 +87,13 @@ func Api(r *gin.Engine) {
 		ui.POST("/delete", service.Delete)
 	}
 
+	/* 关闭
 	{
-		//资源上传
-		service := resource.NewService()
+			//资源上传
+			service := resource.NewService()
 
-		ui := v1.Group("/resource")
-		ui.POST("/upload/avatar", service.Avatar)
+			ui := v1.Group("/resource")
+			ui.POST("/upload/avatar", service.Avatar)
 	}
 
 	{
@@ -102,4 +103,5 @@ func Api(r *gin.Engine) {
 		ui := v1.Group("/voice")
 		ui.POST("/join", service.JoinChatRoom)
 	}
+	*/
 }

@@ -25,7 +25,7 @@ dev: proto doc
 	go run ./service/post main.go rpc
 	go run ./service/user main.go rpc
 
-new_service:
+new:
 	python3 scripts/new_service.py $(module)
 
 dal:

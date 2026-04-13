@@ -28,5 +28,7 @@ files = {
 
 for path,content in files.items():
     p = Path(path)
+    if p.exists():
+        continue
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(content)
