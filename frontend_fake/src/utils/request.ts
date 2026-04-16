@@ -6,6 +6,10 @@ interface apiResponse<T> {
     data: T;
 }
 
+/*继承了父类Error的构造函数，然后被子类定义的构造函数覆盖，使用super复用父类的构造函数
+* this指代当前实例
+* */
+
 class BizError extends Error {
     code: number;
 
@@ -41,13 +45,13 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 export const http = {
-    post: function <T>(url: string, data: unknown): Promise<T> {
+    post: function <T>(url: string, data?: unknown): Promise<T> {
         return request<T>(url, {
             method: "POST",
             body: JSON.stringify(data),
         });
     },
-    delete: function <T>(url: string, data: unknown): Promise<T> {
+    delete: function <T>(url: string, data?: unknown): Promise<T> {
         return request<T>(url, {
             method: "DELETE",
             body: JSON.stringify(data),

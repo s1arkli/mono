@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"mono/gateway/ecode"
 	"mono/gateway/response"
 	"mono/pkg/jwt"
 )
@@ -14,7 +13,7 @@ func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr := c.GetHeader("authorization")
 		if tokenStr == "" {
-			response.Fail(c, ecode.New(1, "token is null"))
+			response.AuthFail(c)
 			c.Abort()
 			return
 		}
@@ -23,12 +22,12 @@ func Auth() gin.HandlerFunc {
 
 		claims, err := jwt.ParseToken(tokenStr)
 		if err != nil || claims == nil {
-			response.Fail(c, ecode.New(1, "请先登录"))
+			response.AuthFail(c)
 			c.Abort()
 			return
 		}
 		if claims.TokenType != jwt.AccessToken {
-			response.Fail(c, ecode.New(1, "请先登录"))
+			response.AuthFail(c)
 			c.Abort()
 			return
 		}

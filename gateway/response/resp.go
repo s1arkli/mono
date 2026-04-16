@@ -29,7 +29,7 @@ func Success(c *gin.Context, data interface{}) {
 
 func AuthFail(c *gin.Context) {
 	c.JSON(200, &Response{
-		Code: 400,
-		Msg:  "token fail",
+		Code: 10100,
+		Msg:  "auth fail",
 	})
 }
