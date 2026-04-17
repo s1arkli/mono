@@ -1,2 +1,15 @@
-/** 负责兼容旧目录结构，对外转发认证模块接口。 */
-export { login, register } from '@/features/auth'
+import {http} from "../utils/request.ts";
+import type {LoginReq, LoginResp, RegisterReq} from "../types/api/auth";
+
+export const authApi = {
+    refresh() {
+        return http.post<string>("account/refresh");
+    },
+    login(data: LoginReq) {
+        return http.post<LoginResp>("account/login", data);
+    },
+    register(data: RegisterReq) {
+        return http.post<string>("account/register", data);
+    },
+};
+

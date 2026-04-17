@@ -1,2 +1,8 @@
-/** 负责兼容旧目录结构，对外转发帖子模块接口。 */
-export { createComment, createPost, fetchPostComment, fetchPostDetail, fetchPostList, toggleLike } from '@/features/post'
+import {http} from "../utils/request.ts";
+import type {ListReq,ListResp} from "../types/api/post";
+
+export const postApi = {
+    List(data:ListReq) {
+    return http.post<ListResp>("/post/list", data);
+    },
+}

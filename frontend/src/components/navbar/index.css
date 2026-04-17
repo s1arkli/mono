@@ -1,0 +1,179 @@
+.navbar {
+    --navbar-shell: #fffdf9;
+    --navbar-bg: #f7f4ef;
+    --navbar-line: #e7ded3;
+    --navbar-muted: #efe6db;
+    --navbar-subtle: #f8f3ec;
+    --navbar-text: #43342a;
+    --navbar-text-soft: #8e7768;
+    --navbar-placeholder: #9aa1ac;
+    --navbar-brand: #d4916e;
+    --navbar-avatar: #e8d7c9;
+
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 88px;
+    padding: 20px 28px 20px 20px;
+    box-sizing: border-box;
+    border: 1px solid var(--navbar-line);
+    border-radius: 24px;
+    background: var(--navbar-shell);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.04);
+    color: var(--navbar-text);
+}
+
+.navbar__left,
+.navbar__right {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.navbar__left {
+    flex: 1 1 0;
+    gap: 16px;
+}
+
+.navbar__brand {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    color: #1f2937;
+    text-decoration: none;
+}
+
+.navbar__brand-text {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+.navbar__home-pill,
+.navbar__post-button,
+.navbar__avatar-button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.navbar__home-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 51px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: var(--navbar-muted);
+    color: var(--navbar-text);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.navbar__right {
+    gap: 8px;
+}
+
+.navbar__post-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 51px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: var(--navbar-muted);
+    color: var(--navbar-text);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.navbar__post-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.68;
+}
+
+.navbar__avatar-button {
+    width: 51px;
+    height: 51px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 999px;
+    background: var(--navbar-avatar);
+    overflow: hidden;
+}
+
+.navbar__avatar-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.navbar__home-pill:hover,
+.navbar__post-button:hover,
+.navbar__avatar-button:hover {
+    filter: brightness(0.98);
+}
+
+.navbar__home-pill:focus-visible,
+.navbar__post-button:focus-visible,
+.navbar__avatar-button:focus-visible,
+.navbar__brand:focus-visible {
+    box-shadow: 0 0 0 3px rgba(212, 145, 110, 0.2);
+}
+
+@media (max-width: 960px) {
+    .navbar {
+        flex-wrap: wrap;
+        padding: 16px;
+    }
+
+    .navbar__left,
+    .navbar__right {
+        flex: 1 1 100%;
+    }
+
+    .navbar__left {
+        justify-content: space-between;
+    }
+
+    .navbar__right {
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 640px) {
+    .navbar {
+        gap: 14px;
+        border-radius: 20px;
+    }
+
+    .navbar__left {
+        gap: 12px;
+    }
+
+    .navbar__brand {
+        gap: 0;
+    }
+
+    .navbar__brand-text {
+        font-size: 18px;
+    }
+
+    .navbar__post-button,
+    .navbar__home-pill {
+        width: 100%;
+    }
+
+    .navbar__right {
+        flex-wrap: wrap;
+    }
+}

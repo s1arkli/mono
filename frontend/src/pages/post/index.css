@@ -1,0 +1,22 @@
+.post-page {
+    padding: 28px 120px 40px;
+    box-sizing: border-box;
+}
+
+.post-page__feed {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+@media (max-width: 960px) {
+    .post-page {
+        padding: 24px 32px 36px;
+    }
+}
+
+@media (max-width: 640px) {
+    .post-page {
+        padding: 20px 16px 28px;
+    }
+}
